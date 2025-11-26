@@ -70,20 +70,22 @@ Delete records. Body is array of records to delete.
 
 When the user asks to manage DNS:
 
-1. **Source zshrc and list current records:**
+1. **List current records:**
    ```bash
-   bash -c 'source ~/.zshrc 2>/dev/null; curl -s "https://spaceship.dev/api/v1/dns/records/DOMAIN?take=500&skip=0" -H "X-Api-Key: $SPACESHIP_API_KEY" -H "X-Api-Secret: $SPACESHIP_API_SECRET"' | jq
+   curl -s "https://spaceship.dev/api/v1/dns/records/DOMAIN?take=500&skip=0" \
+     -H "X-Api-Key: $SPACESHIP_API_KEY" \
+     -H "X-Api-Secret: $SPACESHIP_API_SECRET" | jq
    ```
 
 2. **Parse user's requested records** - they may paste from Spaceship UI, Resend, Cloudflare, or describe in plain text
 
 3. **Create PUT request:**
    ```bash
-   bash -c 'source ~/.zshrc 2>/dev/null; curl -s -X PUT "https://spaceship.dev/api/v1/dns/records/DOMAIN" \
+   curl -s -X PUT "https://spaceship.dev/api/v1/dns/records/DOMAIN" \
      -H "X-Api-Key: $SPACESHIP_API_KEY" \
      -H "X-Api-Secret: $SPACESHIP_API_SECRET" \
      -H "Content-Type: application/json" \
-     -d '\''{"force": true, "items": [RECORDS_JSON]}'\'''
+     -d '{"force": true, "items": [RECORDS_JSON]}'
    ```
 
 4. **Verify** - list records after to confirm
