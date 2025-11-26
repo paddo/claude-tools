@@ -7,15 +7,19 @@ Manage DNS records for domains on spaceship.com via API.
 **Base URL:** `https://spaceship.dev/api/v1`
 
 **Auth Headers:**
-- `X-API-Key`: API key from Spaceship API Manager
-- `X-API-Secret`: API secret
+- `X-Api-Key`: API key from Spaceship API Manager
+- `X-Api-Secret`: API secret
 
-**Credentials:** Store in environment variables `SPACESHIP_API_KEY` and `SPACESHIP_API_SECRET`
+**Credentials:** Store in `~/.zshrc`:
+```bash
+export SPACESHIP_API_KEY="your-key"
+export SPACESHIP_API_SECRET="your-secret"
+```
 
 ## Endpoints
 
-### GET /dns/records/{domain}
-List records. Supports pagination: `?take=500&skip=0&orderBy=type`
+### GET /dns/records/{domain}?take=500&skip=0
+List records. Pagination params `take` and `skip` are **required**.
 
 Response:
 ```json
@@ -23,7 +27,7 @@ Response:
 ```
 
 ### PUT /dns/records/{domain}
-Create/update records. Replaces matched records.
+Create/update records. Matched by type+name, updates existing or adds new.
 
 ```json
 {
@@ -43,7 +47,6 @@ Delete records. Body is array of records to delete.
   "name": "@|subdomain|*.wildcard",
   "ttl": 3600,
 
-  // Type-specific fields:
   "address": "1.2.3.4",           // A, AAAA
   "cname": "target.com",          // CNAME
   "value": "txt content",         // TXT, CAA
@@ -52,76 +55,60 @@ Delete records. Body is array of records to delete.
   "nameserver": "ns1.example.com", // NS
   "aliasName": "target.com",      // ALIAS
 
-  // SRV:
-  "service": "_sip",
+  "service": "_sip",              // SRV
   "protocol": "_tcp",
   "priority": 10,
   "weight": 5,
   "target": "sip.example.com",
 
-  // CAA:
-  "flag": 0,
+  "flag": 0,                      // CAA
   "tag": "issue|issuewild|iodef"
 }
-```
-
-## Common Record Examples
-
-**A Record:**
-```json
-{"type": "A", "name": "@", "ttl": 3600, "address": "1.2.3.4"}
-```
-
-**CNAME:**
-```json
-{"type": "CNAME", "name": "www", "ttl": 3600, "cname": "example.com"}
-```
-
-**MX:**
-```json
-{"type": "MX", "name": "@", "ttl": 3600, "exchange": "mail.example.com", "preference": 10}
-```
-
-**TXT (SPF):**
-```json
-{"type": "TXT", "name": "@", "ttl": 3600, "value": "v=spf1 include:_spf.google.com ~all"}
-```
-
-**TXT (DKIM):**
-```json
-{"type": "TXT", "name": "selector._domainkey", "ttl": 3600, "value": "v=DKIM1; k=rsa; p=..."}
-```
-
-**TXT (DMARC):**
-```json
-{"type": "TXT", "name": "_dmarc", "ttl": 3600, "value": "v=DMARC1; p=none;"}
 ```
 
 ## Instructions
 
 When the user asks to manage DNS:
 
-1. **Check credentials exist:**
+1. **Source zshrc and list current records:**
    ```bash
-   echo "API_KEY: ${SPACESHIP_API_KEY:+set}" && echo "API_SECRET: ${SPACESHIP_API_SECRET:+set}"
+   bash -c 'source ~/.zshrc 2>/dev/null; curl -s "https://spaceship.dev/api/v1/dns/records/DOMAIN?take=500&skip=0" -H "X-Api-Key: $SPACESHIP_API_KEY" -H "X-Api-Secret: $SPACESHIP_API_SECRET"' | jq
    ```
 
-2. **List current records first** to understand existing state:
+2. **Parse user's requested records** - they may paste from Spaceship UI, Resend, Cloudflare, or describe in plain text
+
+3. **Create PUT request:**
    ```bash
-   curl -s -X GET "https://spaceship.dev/api/v1/dns/records/DOMAIN" \
-     -H "X-API-Key: $SPACESHIP_API_KEY" \
-     -H "X-API-Secret: $SPACESHIP_API_SECRET" | jq
+   bash -c 'source ~/.zshrc 2>/dev/null; curl -s -X PUT "https://spaceship.dev/api/v1/dns/records/DOMAIN" \
+     -H "X-Api-Key: $SPACESHIP_API_KEY" \
+     -H "X-Api-Secret: $SPACESHIP_API_SECRET" \
+     -H "Content-Type: application/json" \
+     -d '\''{"force": true, "items": [RECORDS_JSON]}'\'''
    ```
 
-3. **Parse user's requested records** - they may paste from Spaceship UI or describe in plain text
+4. **Verify** - list records after to confirm
 
-4. **Create the PUT request** with properly formatted JSON
+## Common Examples
 
-5. **Execute and verify** - list records after to confirm
+**Resend/SES email setup:**
+```json
+[
+  {"type": "TXT", "name": "resend._domainkey", "ttl": 3600, "value": "p=MIG..."},
+  {"type": "MX", "name": "send", "ttl": 3600, "exchange": "feedback-smtp.us-east-1.amazonses.com", "preference": 10},
+  {"type": "TXT", "name": "send", "ttl": 3600, "value": "v=spf1 include:amazonses.com ~all"},
+  {"type": "TXT", "name": "_dmarc", "ttl": 3600, "value": "v=DMARC1; p=none;"}
+]
+```
+
+**Google Workspace:**
+```json
+[
+  {"type": "MX", "name": "@", "ttl": 3600, "exchange": "aspmx.l.google.com", "preference": 1},
+  {"type": "MX", "name": "@", "ttl": 3600, "exchange": "alt1.aspmx.l.google.com", "preference": 5},
+  {"type": "TXT", "name": "@", "ttl": 3600, "value": "v=spf1 include:_spf.google.com ~all"}
+]
+```
 
 ## Rate Limits
 
-- 5 requests per domain per 300 seconds for write operations
-- 5 requests per domain per 300 seconds for read operations
-
-Always batch multiple record changes into single PUT request.
+5 requests per domain per 300 seconds. Batch multiple record changes into single PUT.
