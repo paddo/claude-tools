@@ -28,9 +28,8 @@ Invoke Codex (OpenAI) to analyze software architecture, research design patterns
 
 3. **Execute Codex:**
    ```bash
-   codex \
-     -a read-only \
-     --full-auto \
+   codex exec \
+     --sandbox read-only \
      "SYSTEM_INSTRUCTION:
    [contents of prompts/codex-prompt.md]
 
