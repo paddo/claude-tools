@@ -21,4 +21,17 @@ claude plugin install spaceship-dns@paddo-tools
 
 ## Requirements
 
-See individual plugin READMEs for setup instructions and API keys.
+```bash
+# gemini-tools
+export GEMINI_API_KEY="..."
+bun install -g gemini-cli
+brew install pngpaste jq
+
+# codex
+export OPENAI_API_KEY="..."
+npm install -g @openai/codex
+
+# spaceship-dns
+export SPACESHIP_API_KEY="..."
+export SPACESHIP_API_SECRET="..."
+```
