@@ -1,0 +1,3 @@
+#!/bin/bash
+output=$("$HOME/.bun/bin/gemini" "$@" 2>&1)
+echo "$output" | jq -r '.response' 2>/dev/null || echo "$output"
