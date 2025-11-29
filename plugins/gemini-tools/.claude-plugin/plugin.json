@@ -1,0 +1,8 @@
+{
+  "name": "gemini-tools",
+  "version": "1.0.0",
+  "description": "Gemini 3 Pro for visual analysis, UI/UX work, and image generation",
+  "author": {
+    "name": "paddo"
+  }
+}

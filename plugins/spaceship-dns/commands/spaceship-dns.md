@@ -114,3 +114,5 @@ When the user asks to manage DNS:
 ## Rate Limits
 
 5 requests per domain per 300 seconds. Batch multiple record changes into single PUT.
+
+USER REQUEST: $*

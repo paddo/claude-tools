@@ -1,0 +1,24 @@
+{
+  "name": "paddo-tools",
+  "description": "Collection of Claude Code plugins for DNS management, AI-assisted architecture, and visual design",
+  "owner": {
+    "name": "paddo"
+  },
+  "plugins": [
+    {
+      "name": "spaceship-dns",
+      "source": "./plugins/spaceship-dns",
+      "description": "Manage DNS records for domains on spaceship.com via API"
+    },
+    {
+      "name": "codex",
+      "source": "./plugins/codex",
+      "description": "Launch OpenAI Codex for software architecture analysis and research"
+    },
+    {
+      "name": "gemini-tools",
+      "source": "./plugins/gemini-tools",
+      "description": "Launch Gemini for visual analysis, UI/UX work, and image generation"
+    }
+  ]
+}
