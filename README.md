@@ -29,7 +29,7 @@ brew install pngpaste jq
 
 # codex
 export OPENAI_API_KEY="..."
-npm install -g @openai/codex
+bun install -g @openai/codex
 
 # spaceship-dns
 export SPACESHIP_API_KEY="..."
