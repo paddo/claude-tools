@@ -14,14 +14,17 @@ You are orchestrating a side-by-side comparison of a legacy site and its migrate
 
 ## First Run Setup
 
-Before doing anything else, check if dependencies are installed:
+Before doing anything else, find the plugin directory and check if dependencies are installed:
 
 ```bash
-# Check if node_modules exists
-ls /Users/paddo/Projects/paddo/claude-tools/plugins/parity/lib/node_modules 2>/dev/null || (cd /Users/paddo/Projects/paddo/claude-tools/plugins/parity/lib && npm install && npx playwright install chromium)
+# Find parity plugin lib directory (works regardless of install location)
+PARITY_LIB=$(dirname "$(find ~/.claude/plugins -name "browser.ts" -path "*/parity/*" 2>/dev/null | head -1)")
+
+# Check if node_modules exists, install if not
+ls "$PARITY_LIB/node_modules" 2>/dev/null || (cd "$PARITY_LIB" && npm install && npx playwright install chromium)
 ```
 
-Run this check silently. If deps need installing, inform the user it's a one-time setup.
+Run this check first. If deps need installing, inform the user it's a one-time setup. Store `PARITY_LIB` for subsequent commands.
 
 ## Input
 
@@ -45,19 +48,19 @@ The user will provide:
 Use the Playwright controller script:
 
 ```bash
-PARITY_DIR=/Users/paddo/Projects/paddo/claude-tools/plugins/parity/lib
+# Use PARITY_LIB from setup step
 
 # Start session (returns session ID)
-npx --prefix $PARITY_DIR tsx $PARITY_DIR/browser.ts start <legacy-url> <migrated-url>
+npx --prefix "$PARITY_LIB" tsx "$PARITY_LIB/browser.ts" start <legacy-url> <migrated-url>
 
 # Capture current state (screenshots + DOM to temp files)
-npx --prefix $PARITY_DIR tsx $PARITY_DIR/browser.ts capture <session-id>
+npx --prefix "$PARITY_LIB" tsx "$PARITY_LIB/browser.ts" capture <session-id>
 
 # Execute action on both browsers
-npx --prefix $PARITY_DIR tsx $PARITY_DIR/browser.ts action <session-id> '<action-json>'
+npx --prefix "$PARITY_LIB" tsx "$PARITY_LIB/browser.ts" action <session-id> '<action-json>'
 
 # End session
-npx --prefix $PARITY_DIR tsx $PARITY_DIR/browser.ts stop <session-id>
+npx --prefix "$PARITY_LIB" tsx "$PARITY_LIB/browser.ts" stop <session-id>
 ```
 
 ## Subagent Spawning
