@@ -1,6 +1,6 @@
 {
   "name": "paddo-tools",
-  "description": "Collection of Claude Code plugins for DNS management, AI-assisted architecture, and visual design",
+  "description": "Collection of Claude Code plugins for DNS management, AI-assisted architecture, visual design, and framework migration",
   "owner": {
     "name": "paddo"
   },
@@ -19,6 +19,11 @@
       "name": "gemini-tools",
       "source": "./plugins/gemini-tools",
       "description": "Launch Gemini for visual analysis, UI/UX work, and image generation"
+    },
+    {
+      "name": "parity",
+      "source": "./plugins/parity",
+      "description": "Compare legacy and migrated sites side-by-side during framework migrations"
     }
   ]
 }

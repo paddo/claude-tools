@@ -1,0 +1,6 @@
+{
+  "name": "parity",
+  "version": "0.1.0",
+  "description": "Compare legacy and migrated sites side-by-side during framework migrations",
+  "author": "paddo"
+}
