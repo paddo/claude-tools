@@ -23,6 +23,7 @@ Delegate to a subagent to isolate token usage:
 ```
 Task(
   subagent_type: "general-purpose",
+  model: "haiku",
   prompt: "Run gemini CLI and return only the response:
     output=$(\"$HOME/.bun/bin/gemini\" --model gemini-3-pro-preview -p \"YOUR PROMPT\" --output-format json 2>/dev/null)
     echo \"$output\" | jq -r '.response' 2>/dev/null || echo \"$output\"

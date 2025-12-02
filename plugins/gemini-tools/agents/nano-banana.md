@@ -16,6 +16,7 @@ Delegate to a subagent to isolate token usage:
 ```
 Task(
   subagent_type: "general-purpose",
+  model: "haiku",
   prompt: "Generate image with Gemini API. Run this bash command and return the output file path:
     P=\"YOUR_PROMPT\" A=\"16:9\" R=\"2K\" O=\"/tmp/nb-$(date +%s)\"
     RESP=$(curl -s \"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent\" \\
