@@ -9,6 +9,13 @@ claude plugin marketplace add paddo/claude-tools
 claude plugin install gemini-tools@paddo-tools
 claude plugin install codex@paddo-tools
 claude plugin install spaceship-dns@paddo-tools
+claude plugin install parity@paddo-tools
+
+# or via slash command
+/install-plugin gemini-tools@paddo-tools
+/install-plugin codex@paddo-tools
+/install-plugin spaceship-dns@paddo-tools
+/install-plugin parity@paddo-tools
 ```
 
 ## Plugins
