@@ -23,8 +23,8 @@ claude plugin install parity@paddo-tools
 
 | Plugin | Description |
 |--------|-------------|
-| **gemini-tools** | Gemini 3 Pro for visual analysis, UI/UX, and image generation (`/gemini`, `/nano-banana`) |
-| **codex** | OpenAI Codex for architecture analysis and research (`/codex`) |
+| **gemini-tools** | Gemini 3 Pro for visual analysis and UI mockup generation (`/visual`, `/mockup`) |
+| **codex** | OpenAI Codex for architecture analysis and code review (`/review`) |
 | **spaceship-dns** | Manage DNS records on spaceship.com (`/spaceship-dns`) |
 | **parity** | Compare legacy and migrated sites during framework migrations (`/parity`) |
 
