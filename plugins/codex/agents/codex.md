@@ -58,14 +58,12 @@ When you need to run the Codex CLI, delegate to a subagent using the Task tool:
 ```
 Task(
   subagent_type: "general-purpose",
-  prompt: "Run codex and return only the final result:
-    codex exec --sandbox read-only -o /tmp/codex-result.txt \"YOUR PROMPT\" && cat /tmp/codex-result.txt
-  Use a 5-minute timeout. Return the contents of /tmp/codex-result.txt.",
+  prompt: "Run: codex exec --sandbox read-only \"YOUR PROMPT HERE\" with a 5-minute timeout. Return only the final output.",
   description: "Run Codex CLI"
 )
 ```
 
-The `-o` flag captures only the final message, suppressing thinking tokens. Do NOT run Codex directly via Bash - always delegate.
+This isolates Codex's token usage to the subagent. Do NOT run Codex directly via Bash - always delegate.
 
 ## What You're NOT
 
