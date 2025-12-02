@@ -8,14 +8,14 @@ Claude Code plugin marketplace.
 claude plugin marketplace add paddo/claude-tools
 claude plugin install gemini-tools@paddo-tools
 claude plugin install codex@paddo-tools
-claude plugin install spaceship-dns@paddo-tools
+claude plugin install dns@paddo-tools
 claude plugin install parity@paddo-tools
 
 # or via slash command
 /plugin marketplace add paddo/claude-tools
 /plugin install gemini-tools@paddo-tools
 /plugin install codex@paddo-tools
-/plugin install spaceship-dns@paddo-tools
+/plugin install dns@paddo-tools
 /plugin install parity@paddo-tools
 ```
 
@@ -25,7 +25,7 @@ claude plugin install parity@paddo-tools
 |--------|-------------|
 | **gemini-tools** | Gemini 3 Pro for visual analysis and UI mockup generation (`/gemini-tools:visual`, `/gemini-tools:mockup`) |
 | **codex** | OpenAI Codex for architecture analysis and code review (`/codex:review`) |
-| **spaceship-dns** | Manage DNS records on spaceship.com (`/spaceship-dns:dns`) |
+| **dns** | Manage DNS records (`/dns:spaceship`) |
 | **parity** | Compare legacy and migrated sites during framework migrations (`/parity:test`) |
 
 ### Parity in action
@@ -56,7 +56,7 @@ brew install pngpaste jq
 export OPENAI_API_KEY="..."
 bun install -g @openai/codex
 
-# spaceship-dns
+# dns (spaceship provider)
 export SPACESHIP_API_KEY="..."
 export SPACESHIP_API_SECRET="..."
 ```

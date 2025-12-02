@@ -1,0 +1,8 @@
+{
+  "name": "dns",
+  "version": "1.0.0",
+  "description": "Manage DNS records via provider APIs",
+  "author": {
+    "name": "paddo"
+  }
+}

@@ -1,5 +1,5 @@
 ---
-name: spaceship-dns
+name: spaceship
 description: Manage DNS records via Spaceship API
 model: haiku
 tools: Bash

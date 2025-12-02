@@ -1,8 +1,0 @@
-{
-  "name": "spaceship-dns",
-  "version": "1.0.0",
-  "description": "Manage DNS records for domains on spaceship.com via API",
-  "author": {
-    "name": "paddo"
-  }
-}
