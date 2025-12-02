@@ -46,17 +46,33 @@ claude plugin install parity@paddo-tools
 
 ## Requirements
 
+### Dependencies
+
 ```bash
 # gemini-tools
-export GEMINI_API_KEY="..."
 bun install -g gemini-cli
 brew install pngpaste jq
 
 # codex
-export OPENAI_API_KEY="..."
 bun install -g @openai/codex
-
-# dns (spaceship provider)
-export SPACESHIP_API_KEY="..."
-export SPACESHIP_API_SECRET="..."
 ```
+
+### Environment Variables
+
+Plugins need API keys. Set them via:
+
+**1. Claude settings** (`~/.claude/settings.json`) - recommended:
+```json
+{
+  "env": {
+    "GEMINI_API_KEY": "...",
+    "OPENAI_API_KEY": "...",
+    "SPACESHIP_API_KEY": "...",
+    "SPACESHIP_API_SECRET": "..."
+  }
+}
+```
+
+**2. Project settings** (`.claude/settings.local.json`) - per-project creds
+
+**3. Shell profile** (`~/.zshrc`) - if already exported globally
