@@ -2,7 +2,7 @@
 name: gemini
 description: Visual analysis, UI/UX work, second opinions via Gemini
 model: sonnet
-tools: Bash, Read, Glob, Grep, Edit
+tools: Task, Read, Glob, Grep, Edit
 ---
 
 # Gemini Visual Analysis Agent
@@ -18,12 +18,20 @@ You provide visual/multimodal analysis, UI/UX insights, or second opinions using
 
 ## Gemini CLI Usage
 
-```bash
-output=$("$HOME/.bun/bin/gemini" --model gemini-3-pro-preview -p "PROMPT" --output-format json 2>/dev/null)
-echo "$output" | jq -r '.response' 2>/dev/null || echo "$output"
+Delegate to a subagent to isolate token usage:
+
+```
+Task(
+  subagent_type: "general-purpose",
+  prompt: "Run gemini CLI and return only the response:
+    output=$(\"$HOME/.bun/bin/gemini\" --model gemini-3-pro-preview -p \"YOUR PROMPT\" --output-format json 2>/dev/null)
+    echo \"$output\" | jq -r '.response' 2>/dev/null || echo \"$output\"
+  For images, include @/path/to/image.png in the prompt.",
+  description: "Run Gemini CLI"
+)
 ```
 
-For images, use `@/path/to/image.png` in the prompt.
+Do NOT run gemini directly via Bash - always delegate to isolate tokens.
 
 ## Workflow
 
