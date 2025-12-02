@@ -12,10 +12,11 @@ claude plugin install spaceship-dns@paddo-tools
 claude plugin install parity@paddo-tools
 
 # or via slash command
-/install-plugin gemini-tools@paddo-tools
-/install-plugin codex@paddo-tools
-/install-plugin spaceship-dns@paddo-tools
-/install-plugin parity@paddo-tools
+/plugin marketplace add paddo/claude-tools
+/plugin install gemini-tools@paddo-tools
+/plugin install codex@paddo-tools
+/plugin install spaceship-dns@paddo-tools
+/plugin install parity@paddo-tools
 ```
 
 ## Plugins
