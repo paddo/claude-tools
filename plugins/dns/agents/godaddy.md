@@ -103,3 +103,48 @@ curl -s -X PUT "https://api.godaddy.com/v1/domains/{domain}/records/{type}/{name
 ```json
 {"type": "TXT", "name": "@", "data": "v=spf1 include:_spf.google.com ~all", "ttl": 3600}
 ```
+
+## Parsing Provider Formats
+
+Users often paste DNS records from provider UIs. Parse carefully:
+
+### Resend Format
+Resend shows records in a table format. Example for `mail.example.com` subdomain:
+
+```
+DKIM
+Type    Name    Value
+TXT     resend._domainkey.mail    p=MIGf...
+
+SPF
+Type    Name    Value    Priority
+MX      send.mail    feedback-smtp.us-east-1.amazonses.com    10
+TXT     send.mail    v=spf1 include:amazonses.com ~all
+```
+
+**Parsing rules:**
+- `resend._domainkey.mail` → name is literally `resend._domainkey.mail` (the `.mail` suffix indicates the `mail` subdomain)
+- `send.mail` → name is literally `send.mail`
+- "Auto" TTL → use 600
+- Priority only applies to MX records
+
+**Resulting JSON for domain `example.com`:**
+```json
+[
+  {"type": "TXT", "name": "resend._domainkey.mail", "data": "p=MIGf...", "ttl": 600},
+  {"type": "MX", "name": "send.mail", "data": "feedback-smtp.us-east-1.amazonses.com", "ttl": 600, "priority": 10},
+  {"type": "TXT", "name": "send.mail", "data": "v=spf1 include:amazonses.com ~all", "ttl": 600}
+]
+```
+
+### Cloudflare Format
+```
+Type    Name    Content    TTL    Proxy
+A       @       192.0.2.1  Auto   Proxied
+CNAME   www     example.com Auto  DNS only
+```
+
+### General Tips
+- Extract domain from user's request if not explicit
+- "Auto" or unspecified TTL → use 600
+- Subdomain records: if user says "for mail.example.com", record names like `foo.mail` are relative to root domain
