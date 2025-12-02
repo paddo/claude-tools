@@ -21,9 +21,9 @@
       "description": "Launch Gemini for visual analysis, UI/UX work, and image generation"
     },
     {
-      "name": "parity",
-      "source": "./plugins/parity",
-      "description": "Compare legacy and migrated sites side-by-side during framework migrations"
+      "name": "headless",
+      "source": "./plugins/headless",
+      "description": "Headless browser automation for site comparison and E2E testing"
     }
   ]
 }
