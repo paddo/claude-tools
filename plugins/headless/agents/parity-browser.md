@@ -11,30 +11,30 @@ You control a single Playwright browser session comparing legacy and migrated si
 
 ## Setup
 
-Find the parity plugin lib directory:
+Find the headless plugin lib directory:
 ```bash
-PARITY_LIB=$(dirname "$(find ~/.claude/plugins -name "browser.ts" -path "*/parity/*" 2>/dev/null | head -1)")
+HEADLESS_LIB=$(dirname "$(find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null | head -1)")
 ```
 
 Check/install deps if first run:
 ```bash
-ls "$PARITY_LIB/node_modules" 2>/dev/null || (cd "$PARITY_LIB" && npm install && npx playwright install chromium)
+ls "$HEADLESS_LIB/node_modules" 2>/dev/null || (cd "$HEADLESS_LIB" && npm install && npx playwright install chromium)
 ```
 
 ## Browser Commands
 
 ```bash
 # Start session - returns session ID
-npx --prefix "$PARITY_LIB" tsx "$PARITY_LIB/browser.ts" start <legacy-url> <migrated-url>
+npx --prefix "$HEADLESS_LIB" tsx "$HEADLESS_LIB/browser.ts" start <legacy-url> <migrated-url>
 
 # Capture state - screenshots + DOM to temp files
-npx --prefix "$PARITY_LIB" tsx "$PARITY_LIB/browser.ts" capture <session-id>
+npx --prefix "$HEADLESS_LIB" tsx "$HEADLESS_LIB/browser.ts" capture <session-id>
 
 # Execute action on both browsers
-npx --prefix "$PARITY_LIB" tsx "$PARITY_LIB/browser.ts" action <session-id> '<action-json>'
+npx --prefix "$HEADLESS_LIB" tsx "$HEADLESS_LIB/browser.ts" action <session-id> '<action-json>'
 
 # End session
-npx --prefix "$PARITY_LIB" tsx "$PARITY_LIB/browser.ts" stop <session-id>
+npx --prefix "$HEADLESS_LIB" tsx "$HEADLESS_LIB/browser.ts" stop <session-id>
 ```
 
 ## Action JSON Format

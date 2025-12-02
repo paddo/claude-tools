@@ -1,0 +1,8 @@
+{
+  "name": "headless",
+  "version": "0.1.0",
+  "description": "Headless browser automation for site comparison and E2E testing",
+  "author": {
+    "name": "paddo"
+  }
+}

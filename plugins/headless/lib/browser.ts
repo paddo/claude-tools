@@ -3,12 +3,13 @@ import * as fs from "fs";
 import * as path from "path";
 
 interface Session {
+  mode: "parity" | "single";
   legacyContext: BrowserContext;
-  migratedContext: BrowserContext;
+  migratedContext?: BrowserContext;
   legacyPage: Page;
-  migratedPage: Page;
+  migratedPage?: Page;
   legacyBase: string;
-  migratedBase: string;
+  migratedBase?: string;
 }
 
 interface ActionPayload {
@@ -21,17 +22,24 @@ interface ActionPayload {
 }
 
 interface CaptureResult {
-  legacyScreenshot: string;
-  migratedScreenshot: string;
-  legacyDom: string;
-  migratedDom: string;
-  legacyConsole: string[];
-  migratedConsole: string[];
+  screenshot: string;
+  dom: string;
+  console: string[];
+  // Parity mode only
+  legacyScreenshot?: string;
+  migratedScreenshot?: string;
+  legacyDom?: string;
+  migratedDom?: string;
+  legacyConsole?: string[];
+  migratedConsole?: string[];
 }
 
 interface ActionResult {
-  legacySuccess: boolean;
-  migratedSuccess: boolean;
+  success: boolean;
+  error?: string;
+  // Parity mode only
+  legacySuccess?: boolean;
+  migratedSuccess?: boolean;
   legacyError?: string;
   migratedError?: string;
 }
@@ -40,11 +48,41 @@ const sessions = new Map<string, Session>();
 const consoleMessages = new Map<string, { legacy: string[]; migrated: string[] }>();
 let browser: Browser | null = null;
 
+// Single-site mode
+async function startSingle(url: string): Promise<string> {
+  const b = await getBrowser();
+  const sessionId = generateSessionId();
+
+  const viewport = { width: 1280, height: 720 };
+  const context = await b.newContext({ viewport });
+  const page = await context.newPage();
+
+  consoleMessages.set(sessionId, { legacy: [], migrated: [] });
+
+  page.on("console", (msg) => {
+    consoleMessages.get(sessionId)?.legacy.push(`[${msg.type()}] ${msg.text()}`);
+  });
+
+  await page.goto(url);
+
+  sessions.set(sessionId, {
+    mode: "single",
+    legacyContext: context,
+    legacyPage: page,
+    legacyBase: new URL(url).origin,
+  });
+
+  console.log(JSON.stringify({ sessionId, status: "started", mode: "single" }));
+  return sessionId;
+}
+
 // Cleanup on exit
 async function cleanup() {
   for (const [id, session] of sessions) {
     await session.legacyContext.close().catch(() => {});
-    await session.migratedContext.close().catch(() => {});
+    if (session.migratedContext) {
+      await session.migratedContext.close().catch(() => {});
+    }
   }
   sessions.clear();
   if (browser) {
@@ -92,6 +130,7 @@ async function start(legacyUrl: string, migratedUrl: string): Promise<string> {
   await Promise.all([legacyPage.goto(legacyUrl), migratedPage.goto(migratedUrl)]);
 
   sessions.set(sessionId, {
+    mode: "parity",
     legacyContext,
     migratedContext,
     legacyPage,
@@ -100,7 +139,7 @@ async function start(legacyUrl: string, migratedUrl: string): Promise<string> {
     migratedBase: new URL(migratedUrl).origin,
   });
 
-  console.log(JSON.stringify({ sessionId, status: "started" }));
+  console.log(JSON.stringify({ sessionId, status: "started", mode: "parity" }));
   return sessionId;
 }
 
@@ -108,34 +147,54 @@ async function capture(sessionId: string): Promise<CaptureResult> {
   const session = sessions.get(sessionId);
   if (!session) throw new Error(`Session ${sessionId} not found`);
 
-  const tmpDir = `/tmp/parity-${sessionId}`;
+  const tmpDir = `/tmp/headless-${sessionId}`;
   fs.mkdirSync(tmpDir, { recursive: true });
 
+  const msgs = consoleMessages.get(sessionId) || { legacy: [], migrated: [] };
+
+  // Single-site mode
+  if (session.mode === "single") {
+    const screenshotPath = path.join(tmpDir, "screenshot.jpg");
+    const domPath = path.join(tmpDir, "dom.html");
+
+    await session.legacyPage.screenshot({ path: screenshotPath, fullPage: false, type: "jpeg", quality: 50, scale: "css" });
+    const content = await session.legacyPage.content();
+    fs.writeFileSync(domPath, content);
+
+    const result: CaptureResult = {
+      screenshot: screenshotPath,
+      dom: domPath,
+      console: [...msgs.legacy],
+    };
+
+    msgs.legacy = [];
+    console.log(JSON.stringify(result));
+    return result;
+  }
+
+  // Parity mode
   const legacyScreenshot = path.join(tmpDir, "legacy.jpg");
   const migratedScreenshot = path.join(tmpDir, "migrated.jpg");
   const legacyDomPath = path.join(tmpDir, "legacy-dom.html");
   const migratedDomPath = path.join(tmpDir, "migrated-dom.html");
 
-  const [legacyHtml, migratedHtml] = await Promise.all([
+  await Promise.all([
     session.legacyPage.screenshot({ path: legacyScreenshot, fullPage: false, type: "jpeg", quality: 50, scale: "css" }),
-    session.migratedPage.screenshot({ path: migratedScreenshot, fullPage: false, type: "jpeg", quality: 50, scale: "css" }),
-    session.legacyPage.content(),
-    session.migratedPage.content(),
-  ]).then(async ([, , legacyContent, migratedContent]) => {
-    return [legacyContent, migratedContent];
-  });
+    session.migratedPage!.screenshot({ path: migratedScreenshot, fullPage: false, type: "jpeg", quality: 50, scale: "css" }),
+  ]);
 
   const [legacyContent, migratedContent] = await Promise.all([
     session.legacyPage.content(),
-    session.migratedPage.content(),
+    session.migratedPage!.content(),
   ]);
 
   fs.writeFileSync(legacyDomPath, legacyContent);
   fs.writeFileSync(migratedDomPath, migratedContent);
 
-  const msgs = consoleMessages.get(sessionId) || { legacy: [], migrated: [] };
-
   const result: CaptureResult = {
+    screenshot: legacyScreenshot,
+    dom: legacyDomPath,
+    console: [...msgs.legacy],
     legacyScreenshot,
     migratedScreenshot,
     legacyDom: legacyDomPath,
@@ -155,9 +214,7 @@ async function executeAction(sessionId: string, action: ActionPayload): Promise<
   const session = sessions.get(sessionId);
   if (!session) throw new Error(`Session ${sessionId} not found`);
 
-  const result: ActionResult = { legacySuccess: true, migratedSuccess: true };
-
-  const performAction = async (page: Page, baseUrl: string, target: "legacy" | "migrated") => {
+  const performAction = async (page: Page, baseUrl: string): Promise<{ success: boolean; error?: string }> => {
     try {
       switch (action.type) {
         case "click":
@@ -197,26 +254,43 @@ async function executeAction(sessionId: string, action: ActionPayload): Promise<
           await page.selectOption(action.selector, action.value);
           break;
       }
+      return { success: true };
     } catch (err) {
-      if (target === "legacy") {
-        result.legacySuccess = false;
-        result.legacyError = String(err);
-      } else {
-        result.migratedSuccess = false;
-        result.migratedError = String(err);
-      }
+      return { success: false, error: String(err) };
     }
   };
 
-  await Promise.all([
-    performAction(session.legacyPage, session.legacyBase, "legacy"),
-    performAction(session.migratedPage, session.migratedBase, "migrated"),
+  // Single-site mode
+  if (session.mode === "single") {
+    const actionResult = await performAction(session.legacyPage, session.legacyBase);
+    await session.legacyPage.waitForLoadState("networkidle").catch(() => {});
+
+    const result: ActionResult = {
+      success: actionResult.success,
+      error: actionResult.error,
+    };
+    console.log(JSON.stringify(result));
+    return result;
+  }
+
+  // Parity mode
+  const [legacyResult, migratedResult] = await Promise.all([
+    performAction(session.legacyPage, session.legacyBase),
+    performAction(session.migratedPage!, session.migratedBase!),
   ]);
 
   await Promise.all([
     session.legacyPage.waitForLoadState("networkidle").catch(() => {}),
-    session.migratedPage.waitForLoadState("networkidle").catch(() => {}),
+    session.migratedPage!.waitForLoadState("networkidle").catch(() => {}),
   ]);
+
+  const result: ActionResult = {
+    success: legacyResult.success && migratedResult.success,
+    legacySuccess: legacyResult.success,
+    migratedSuccess: migratedResult.success,
+    legacyError: legacyResult.error,
+    migratedError: migratedResult.error,
+  };
 
   console.log(JSON.stringify(result));
   return result;
@@ -227,7 +301,9 @@ async function stop(sessionId: string): Promise<void> {
   if (!session) throw new Error(`Session ${sessionId} not found`);
 
   await session.legacyContext.close();
-  await session.migratedContext.close();
+  if (session.migratedContext) {
+    await session.migratedContext.close();
+  }
   sessions.delete(sessionId);
   consoleMessages.delete(sessionId);
 
@@ -249,6 +325,14 @@ async function main() {
         process.exit(1);
       }
       await start(args[0], args[1]);
+      break;
+
+    case "start-single":
+      if (args.length < 1) {
+        console.error("Usage: browser.ts start-single <url>");
+        process.exit(1);
+      }
+      await startSingle(args[0]);
       break;
 
     case "capture":
@@ -276,7 +360,7 @@ async function main() {
       break;
 
     default:
-      console.error("Commands: start, capture, action, stop");
+      console.error("Commands: start, start-single, capture, action, stop");
       process.exit(1);
   }
 }

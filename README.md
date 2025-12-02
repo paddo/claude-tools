@@ -9,14 +9,14 @@ claude plugin marketplace add paddo/claude-tools
 claude plugin install gemini-tools@paddo-tools
 claude plugin install codex@paddo-tools
 claude plugin install dns@paddo-tools
-claude plugin install parity@paddo-tools
+claude plugin install headless@paddo-tools
 
 # or via slash command
 /plugin marketplace add paddo/claude-tools
 /plugin install gemini-tools@paddo-tools
 /plugin install codex@paddo-tools
 /plugin install dns@paddo-tools
-/plugin install parity@paddo-tools
+/plugin install headless@paddo-tools
 ```
 
 ## Plugins
@@ -26,14 +26,14 @@ claude plugin install parity@paddo-tools
 | **gemini-tools** | Gemini 3 Pro for visual analysis and UI mockup generation (`/gemini-tools:visual`, `/gemini-tools:mockup`) |
 | **codex** | OpenAI Codex for architecture analysis and code review (`/codex:review`) |
 | **dns** | Manage DNS records (`/dns:spaceship`, `/dns:godaddy`) |
-| **parity** | Compare legacy and migrated sites during framework migrations (`/parity:test`) |
+| **headless** | Headless browser automation for site comparison and E2E testing (`/headless:parity`, `/headless:test`) |
 
-### Parity in action
+### Headless in action
 
 ```
 ⏺ Now spawning parallel parity-browser agents to test the public pages:
 
-⏺ Running 4 parity:parity-browser agents… (ctrl+o to expand)
+⏺ Running 4 headless:parity-browser agents… (ctrl+o to expand)
    ├─ Parity: Homepage · 34 tool uses · 33.4k tokens
    │  ⎿ Done
    ├─ Parity: Terms page · 19 tool uses · 21.0k tokens

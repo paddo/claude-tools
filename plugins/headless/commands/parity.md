@@ -52,13 +52,13 @@ Spawn all agents in a single response for parallel execution.
 
 Before spawning agents, check if deps are installed:
 ```bash
-PARITY_LIB=$(dirname "$(find ~/.claude/plugins -name "browser.ts" -path "*/parity/*" 2>/dev/null | head -1)")
-ls "$PARITY_LIB/node_modules" 2>/dev/null || echo "DEPS_NEEDED"
+HEADLESS_LIB=$(dirname "$(find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null | head -1)")
+ls "$HEADLESS_LIB/node_modules" 2>/dev/null || echo "DEPS_NEEDED"
 ```
 
 If DEPS_NEEDED, run setup first:
 ```bash
-cd "$PARITY_LIB" && npm install && npx playwright install chromium
+cd "$HEADLESS_LIB" && npm install && npx playwright install chromium
 ```
 
 ## Aggregating Results
