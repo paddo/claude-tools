@@ -6,9 +6,9 @@
   },
   "plugins": [
     {
-      "name": "spaceship-dns",
-      "source": "./plugins/spaceship-dns",
-      "description": "Manage DNS records for domains on spaceship.com via API"
+      "name": "dns",
+      "source": "./plugins/dns",
+      "description": "Manage DNS records via provider APIs"
     },
     {
       "name": "codex",

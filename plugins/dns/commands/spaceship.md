@@ -4,9 +4,9 @@ allowed-tools:
 description: Manage DNS records for domains on Spaceship
 ---
 
-Delegate this to the **spaceship-dns** agent to handle independently.
+Delegate this to the **spaceship** agent to handle independently.
 
-The spaceship-dns agent will:
+The spaceship agent will:
 - List current DNS records for the domain
 - Parse records from various formats (Spaceship UI, Resend, Cloudflare, plain text)
 - Create/update/delete records via the Spaceship API
