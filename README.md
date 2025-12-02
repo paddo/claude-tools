@@ -23,10 +23,10 @@ claude plugin install parity@paddo-tools
 
 | Plugin | Description |
 |--------|-------------|
-| **gemini-tools** | Gemini 3 Pro for visual analysis and UI mockup generation (`/visual`, `/mockup`) |
-| **codex** | OpenAI Codex for architecture analysis and code review (`/review`) |
-| **spaceship-dns** | Manage DNS records on spaceship.com (`/spaceship-dns`) |
-| **parity** | Compare legacy and migrated sites during framework migrations (`/parity`) |
+| **gemini-tools** | Gemini 3 Pro for visual analysis and UI mockup generation (`/gemini-tools:visual`, `/gemini-tools:mockup`) |
+| **codex** | OpenAI Codex for architecture analysis and code review (`/codex:review`) |
+| **spaceship-dns** | Manage DNS records on spaceship.com (`/spaceship-dns:dns`) |
+| **parity** | Compare legacy and migrated sites during framework migrations (`/parity:test`) |
 
 ### Parity in action
 
