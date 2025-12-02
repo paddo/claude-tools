@@ -40,8 +40,8 @@ claude plugin install parity@paddo-tools
    │  ⎿ Bash: Run test from parity lib directory
    ├─ Parity: Login page · 46 tool uses · 57.5k tokens
    │  ⎿ Done
-   └─ Parity: Audiences page · 24 tool uses · 28.2k tokens
-      ⎿ Read: /tmp/audiences-test/migrated-console.json
+   └─ Parity: Dashboard page · 24 tool uses · 28.2k tokens
+      ⎿ Done
 ```
 
 ## Requirements
