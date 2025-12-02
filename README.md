@@ -25,7 +25,7 @@ claude plugin install parity@paddo-tools
 |--------|-------------|
 | **gemini-tools** | Gemini 3 Pro for visual analysis and UI mockup generation (`/gemini-tools:visual`, `/gemini-tools:mockup`) |
 | **codex** | OpenAI Codex for architecture analysis and code review (`/codex:review`) |
-| **dns** | Manage DNS records (`/dns:spaceship`) |
+| **dns** | Manage DNS records (`/dns:spaceship`, `/dns:godaddy`) |
 | **parity** | Compare legacy and migrated sites during framework migrations (`/parity:test`) |
 
 ### Parity in action
@@ -68,7 +68,9 @@ Plugins need API keys. Set them via:
     "GEMINI_API_KEY": "...",
     "OPENAI_API_KEY": "...",
     "SPACESHIP_API_KEY": "...",
-    "SPACESHIP_API_SECRET": "..."
+    "SPACESHIP_API_SECRET": "...",
+    "GODADDY_API_KEY": "...",
+    "GODADDY_API_SECRET": "..."
   }
 }
 ```
