@@ -40,6 +40,23 @@ const sessions = new Map<string, Session>();
 const consoleMessages = new Map<string, { legacy: string[]; migrated: string[] }>();
 let browser: Browser | null = null;
 
+// Cleanup on exit
+async function cleanup() {
+  for (const [id, session] of sessions) {
+    await session.legacyContext.close().catch(() => {});
+    await session.migratedContext.close().catch(() => {});
+  }
+  sessions.clear();
+  if (browser) {
+    await browser.close().catch(() => {});
+    browser = null;
+  }
+}
+
+process.on("SIGINT", async () => { await cleanup(); process.exit(0); });
+process.on("SIGTERM", async () => { await cleanup(); process.exit(0); });
+process.on("exit", () => { cleanup(); });
+
 async function getBrowser(): Promise<Browser> {
   if (!browser) {
     browser = await chromium.launch({ headless: true });

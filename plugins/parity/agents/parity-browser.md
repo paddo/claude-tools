@@ -62,7 +62,7 @@ Do:
 3. Navigate and interact as instructed
 4. Compare screenshots and DOM at each step
 5. Report differences found
-6. Stop session
+6. **ALWAYS stop session** - even if errors occur, run `stop` command to cleanup
 
 ## Comparison Focus
 
