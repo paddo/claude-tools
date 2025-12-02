@@ -2,7 +2,7 @@
 name: codex
 description: Architecture analysis and research using OpenAI Codex
 model: opus
-tools: Bash, Read, Glob, Grep
+tools: Task, Read, Glob, Grep
 ---
 
 # Codex Architecture & Research Agent
@@ -53,13 +53,17 @@ Keep responses concise but thorough. Structure as:
 
 ## External Research
 
-Use the Codex CLI for external research when needed:
+When you need to run the Codex CLI, delegate to a subagent using the Task tool:
 
-```bash
-codex exec --sandbox read-only "PROMPT"
+```
+Task(
+  subagent_type: "general-purpose",
+  prompt: "Run: codex exec --sandbox read-only \"YOUR PROMPT HERE\" with a 5-minute timeout. Return only the final output.",
+  description: "Run Codex CLI"
+)
 ```
 
-**Important**: Run Codex synchronously (do NOT use `run_in_background`). Use a 5-minute timeout. This avoids repeated BashOutput polling which wastes tokens.
+This isolates Codex's token usage to the subagent. Do NOT run Codex directly via Bash - always delegate.
 
 ## What You're NOT
 
