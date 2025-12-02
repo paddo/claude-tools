@@ -1,29 +1,17 @@
 ---
 allowed-tools:
-  - Bash
-  - Read
-  - Glob
-  - Grep
-  - Edit
+  - Task
 description: Launch Gemini 3 Pro for visual analysis, UI/UX work, research, or second opinions
 ---
 
-Invoke Gemini 3 Pro for visual/multimodal analysis, UI/UX work, or a second opinion.
+Delegate this to the **gemini** agent to handle independently.
 
-## Usage
+The gemini agent will:
+- Analyze screenshots, mockups, and UI designs
+- Provide visual feedback on layouts, typography, color
+- Research design patterns and UX best practices
+- Offer second opinions on implementation approaches
 
-```bash
-output=$("$HOME/.bun/bin/gemini" --model gemini-3-pro-preview -p "PROMPT" --output-format json 2>/dev/null)
-echo "$output" | jq -r '.response' 2>/dev/null || echo "$output"
-```
-
-For images, use `@/path/to/image.png` in the prompt.
-
-## Steps
-
-1. If visual input mentioned: `pngpaste /tmp/gemini-input.png`
-2. Gather relevant context (files, code)
-3. Run gemini with context and image path in prompt
-4. Apply changes (Edit) or return analysis based on intent
+If the user mentions a screenshot or clipboard image, note that the agent should capture it with `pngpaste`.
 
 USER REQUEST: $*
