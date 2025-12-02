@@ -52,15 +52,19 @@ Spawn all agents in a single response for parallel execution.
 
 ## First Run Setup
 
-Before spawning agents, check if deps are installed:
+Before spawning agents, find the lib path:
 ```bash
-HEADLESS_LIB=$(dirname "$(find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null | head -1)")
-ls "$HEADLESS_LIB/node_modules" 2>/dev/null || echo "DEPS_NEEDED"
+find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null
+```
+
+Check if deps are installed (use dirname of path above):
+```bash
+ls /path/to/lib/node_modules 2>/dev/null || echo "DEPS_NEEDED"
 ```
 
 If DEPS_NEEDED, run setup first:
 ```bash
-cd "$HEADLESS_LIB" && npm install && npx playwright install chromium
+cd /path/to/lib && npm install && npx playwright install chromium
 ```
 
 ## Aggregating Results

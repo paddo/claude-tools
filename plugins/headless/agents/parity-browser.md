@@ -11,30 +11,35 @@ You control a single Playwright browser session comparing legacy and migrated si
 
 ## Setup
 
-Find the headless plugin lib directory:
+First, find the lib path and set it as a variable. Run this ONCE at the start:
 ```bash
-HEADLESS_LIB=$(dirname "$(find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null | head -1)")
+find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null
 ```
 
-Check/install deps if first run:
+This will output a path like `/Users/you/.claude/plugins/headless@paddo-tools/lib/browser.ts`.
+Use the directory containing browser.ts as HEADLESS_LIB for all subsequent commands.
+
+Check/install deps if first run (replace the path):
 ```bash
-ls "$HEADLESS_LIB/node_modules" 2>/dev/null || (cd "$HEADLESS_LIB" && npm install && npx playwright install chromium)
+cd /path/to/lib && ls node_modules 2>/dev/null || npm install && npx playwright install chromium
 ```
 
 ## Browser Commands
 
+Replace `/path/to/lib` with the actual path from the find command above:
+
 ```bash
 # Start session - returns session ID
-npx --prefix "$HEADLESS_LIB" tsx "$HEADLESS_LIB/browser.ts" start <legacy-url> <migrated-url>
+npx --prefix /path/to/lib tsx /path/to/lib/browser.ts start <legacy-url> <migrated-url>
 
 # Capture state - screenshots + DOM to temp files
-npx --prefix "$HEADLESS_LIB" tsx "$HEADLESS_LIB/browser.ts" capture <session-id>
+npx --prefix /path/to/lib tsx /path/to/lib/browser.ts capture <session-id>
 
 # Execute action on both browsers
-npx --prefix "$HEADLESS_LIB" tsx "$HEADLESS_LIB/browser.ts" action <session-id> '<action-json>'
+npx --prefix /path/to/lib tsx /path/to/lib/browser.ts action <session-id> '<action-json>'
 
 # End session
-npx --prefix "$HEADLESS_LIB" tsx "$HEADLESS_LIB/browser.ts" stop <session-id>
+npx --prefix /path/to/lib tsx /path/to/lib/browser.ts stop <session-id>
 ```
 
 ## Action JSON Format
