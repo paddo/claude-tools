@@ -18,6 +18,23 @@ claude plugin install spaceship-dns@paddo-tools
 | **gemini-tools** | Gemini 3 Pro for visual analysis, UI/UX, and image generation (`/gemini`, `/nano-banana`) |
 | **codex** | OpenAI Codex for architecture analysis and research (`/codex`) |
 | **spaceship-dns** | Manage DNS records on spaceship.com (`/spaceship-dns`) |
+| **parity** | Compare legacy and migrated sites during framework migrations (`/parity`) |
+
+### Parity in action
+
+```
+⏺ Now spawning parallel parity-browser agents to test the public pages:
+
+⏺ Running 4 parity:parity-browser agents… (ctrl+o to expand)
+   ├─ Parity: Homepage · 34 tool uses · 33.4k tokens
+   │  ⎿ Done
+   ├─ Parity: Terms page · 19 tool uses · 21.0k tokens
+   │  ⎿ Bash: Run test from parity lib directory
+   ├─ Parity: Login page · 46 tool uses · 57.5k tokens
+   │  ⎿ Done
+   └─ Parity: Audiences page · 24 tool uses · 28.2k tokens
+      ⎿ Read: /tmp/audiences-test/migrated-console.json
+```
 
 ## Requirements
 
