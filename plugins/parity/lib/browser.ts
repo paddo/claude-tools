@@ -110,14 +110,14 @@ async function capture(sessionId: string): Promise<CaptureResult> {
   const tmpDir = `/tmp/parity-${sessionId}`;
   fs.mkdirSync(tmpDir, { recursive: true });
 
-  const legacyScreenshot = path.join(tmpDir, "legacy.png");
-  const migratedScreenshot = path.join(tmpDir, "migrated.png");
+  const legacyScreenshot = path.join(tmpDir, "legacy.jpg");
+  const migratedScreenshot = path.join(tmpDir, "migrated.jpg");
   const legacyDomPath = path.join(tmpDir, "legacy-dom.html");
   const migratedDomPath = path.join(tmpDir, "migrated-dom.html");
 
   const [legacyHtml, migratedHtml] = await Promise.all([
-    session.legacyPage.screenshot({ path: legacyScreenshot, fullPage: false }),
-    session.migratedPage.screenshot({ path: migratedScreenshot, fullPage: false }),
+    session.legacyPage.screenshot({ path: legacyScreenshot, fullPage: false, type: "jpeg", quality: 80 }),
+    session.migratedPage.screenshot({ path: migratedScreenshot, fullPage: false, type: "jpeg", quality: 80 }),
     session.legacyPage.content(),
     session.migratedPage.content(),
   ]).then(async ([, , legacyContent, migratedContent]) => {
