@@ -72,8 +72,9 @@ async function start(legacyUrl: string, migratedUrl: string): Promise<string> {
   const b = await getBrowser();
   const sessionId = generateSessionId();
 
-  const legacyContext = await b.newContext();
-  const migratedContext = await b.newContext();
+  const viewport = { width: 1280, height: 720 };
+  const legacyContext = await b.newContext({ viewport });
+  const migratedContext = await b.newContext({ viewport });
 
   const legacyPage = await legacyContext.newPage();
   const migratedPage = await migratedContext.newPage();
@@ -116,8 +117,8 @@ async function capture(sessionId: string): Promise<CaptureResult> {
   const migratedDomPath = path.join(tmpDir, "migrated-dom.html");
 
   const [legacyHtml, migratedHtml] = await Promise.all([
-    session.legacyPage.screenshot({ path: legacyScreenshot, fullPage: false, type: "jpeg", quality: 80 }),
-    session.migratedPage.screenshot({ path: migratedScreenshot, fullPage: false, type: "jpeg", quality: 80 }),
+    session.legacyPage.screenshot({ path: legacyScreenshot, fullPage: false, type: "jpeg", quality: 50, scale: "css" }),
+    session.migratedPage.screenshot({ path: migratedScreenshot, fullPage: false, type: "jpeg", quality: 50, scale: "css" }),
     session.legacyPage.content(),
     session.migratedPage.content(),
   ]).then(async ([, , legacyContent, migratedContent]) => {
