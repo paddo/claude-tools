@@ -58,12 +58,13 @@ When you need to run the Codex CLI, delegate to a subagent using the Task tool:
 ```
 Task(
   subagent_type: "general-purpose",
+  model: "haiku",
   prompt: "Run: codex exec --sandbox read-only \"YOUR PROMPT HERE\" with a 5-minute timeout. Return only the final output.",
   description: "Run Codex CLI"
 )
 ```
 
-This isolates Codex's token usage to the subagent. Do NOT run Codex directly via Bash - always delegate.
+Use haiku model for the subagent to minimize token costs. Do NOT run Codex directly via Bash - always delegate.
 
 ## What You're NOT
 
