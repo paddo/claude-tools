@@ -59,6 +59,8 @@ Use the Codex CLI for external research when needed:
 codex exec --sandbox read-only "PROMPT"
 ```
 
+**Important**: Run Codex synchronously (do NOT use `run_in_background`). Use a 5-minute timeout. This avoids repeated BashOutput polling which wastes tokens.
+
 ## What You're NOT
 
 - Not a code generator—you think and design, you don't implement (unless explicitly asked)
