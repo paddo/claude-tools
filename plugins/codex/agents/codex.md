@@ -64,7 +64,7 @@ Task(
 )
 ```
 
-Use haiku model for the subagent to minimize token costs. Do NOT run Codex directly via Bash - always delegate.
+**CRITICAL**: Do NOT run Codex directly via Bash - always delegate to the Task subagent. This avoids shell parsing issues with parentheses and special characters in prompts, and minimizes token costs.
 
 ## What You're NOT
 

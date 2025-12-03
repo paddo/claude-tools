@@ -32,7 +32,7 @@ Task(
 )
 ```
 
-Do NOT run gemini directly via Bash - always delegate to isolate tokens.
+**CRITICAL**: Do NOT run gemini directly via Bash - always delegate to the Task subagent. This avoids shell parsing issues with parentheses and special characters in prompts.
 
 ## Workflow
 
