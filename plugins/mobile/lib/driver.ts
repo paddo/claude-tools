@@ -1,5 +1,5 @@
-import { remote, Browser } from "webdriverio";
-import { spawn, ChildProcess } from "child_process";
+import { remote, attach, Browser } from "webdriverio";
+import { spawn } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import * as http from "http";
@@ -8,8 +8,8 @@ type Platform = "ios" | "android";
 type AppType = "native" | "flutter";
 type SessionMode = "single" | "parity-migration" | "parity-cross";
 
-let appiumProcess: ChildProcess | null = null;
-let appiumPort = 4723;
+const appiumPort = 4723;
+const SESSION_DIR = "/tmp/mobile-sessions";
 
 interface Session {
   mode: SessionMode;
@@ -53,6 +53,76 @@ interface ActionResult {
 
 const sessions = new Map<string, Session>();
 
+interface SessionFile {
+  mode: SessionMode;
+  primarySessionId: string;
+  secondarySessionId?: string;
+  primaryPlatform: Platform;
+  secondaryPlatform?: Platform;
+  primaryApp: string;
+  secondaryApp?: string;
+  port: number;
+}
+
+function saveSession(sessionId: string, data: SessionFile): void {
+  fs.mkdirSync(SESSION_DIR, { recursive: true });
+  fs.writeFileSync(path.join(SESSION_DIR, `${sessionId}.json`), JSON.stringify(data));
+}
+
+function loadSession(sessionId: string): SessionFile | null {
+  const file = path.join(SESSION_DIR, `${sessionId}.json`);
+  if (!fs.existsSync(file)) return null;
+  return JSON.parse(fs.readFileSync(file, "utf-8"));
+}
+
+function deleteSessionFile(sessionId: string): void {
+  const file = path.join(SESSION_DIR, `${sessionId}.json`);
+  if (fs.existsSync(file)) fs.unlinkSync(file);
+}
+
+async function reattachDriver(wdSessionId: string, port: number): Promise<Browser> {
+  return attach({
+    sessionId: wdSessionId,
+    hostname: "127.0.0.1",
+    port,
+    path: "/",
+    logLevel: "silent",
+  });
+}
+
+async function getSession(sessionId: string): Promise<Session> {
+  // Check in-memory first
+  let session = sessions.get(sessionId);
+  if (session) return session;
+
+  // Try to reattach from file
+  const saved = loadSession(sessionId);
+  if (!saved) throw new Error(`Session ${sessionId} not found`);
+
+  // Ensure Appium is running
+  await ensureAppium(saved.port);
+
+  // Reattach to WebDriver sessions
+  const primaryDriver = await reattachDriver(saved.primarySessionId, saved.port);
+  let secondaryDriver: Browser | undefined;
+  if (saved.secondarySessionId) {
+    secondaryDriver = await reattachDriver(saved.secondarySessionId, saved.port);
+  }
+
+  session = {
+    mode: saved.mode,
+    primaryDriver,
+    secondaryDriver,
+    primaryPlatform: saved.primaryPlatform,
+    secondaryPlatform: saved.secondaryPlatform,
+    primaryApp: saved.primaryApp,
+    secondaryApp: saved.secondaryApp,
+  };
+
+  sessions.set(sessionId, session);
+  return session;
+}
+
 async function isAppiumRunning(port: number): Promise<boolean> {
   return new Promise((resolve) => {
     const req = http.request({ hostname: "127.0.0.1", port, path: "/status", method: "GET", timeout: 1000 }, (res) => {
@@ -67,7 +137,7 @@ async function isAppiumRunning(port: number): Promise<boolean> {
 async function ensureAppium(port: number): Promise<void> {
   if (await isAppiumRunning(port)) return;
 
-  // Start local Appium from node_modules
+  // Start local Appium from node_modules - detached so it survives process exit
   const libDir = path.dirname(new URL(import.meta.url).pathname);
   const appiumBin = path.join(libDir, "node_modules", ".bin", "appium");
 
@@ -75,10 +145,11 @@ async function ensureAppium(port: number): Promise<void> {
     throw new Error(`Appium not found. Run: npm install --prefix ${libDir}`);
   }
 
-  appiumProcess = spawn(appiumBin, ["--port", String(port), "--relaxed-security"], {
-    stdio: ["ignore", "pipe", "pipe"],
-    detached: false,
+  const child = spawn(appiumBin, ["--port", String(port), "--relaxed-security"], {
+    stdio: "ignore",
+    detached: true,
   });
+  child.unref(); // Allow parent to exit independently
 
   // Wait for server to be ready
   for (let i = 0; i < 30; i++) {
@@ -169,6 +240,7 @@ async function createDriver(platform: Platform, appId: string, opts: Record<stri
 // Single app testing
 async function startSingle(platform: Platform, appId: string, opts: Record<string, string>): Promise<string> {
   const sessionId = generateSessionId();
+  const port = parseInt(opts.port || String(appiumPort), 10);
   const driver = await createDriver(platform, appId, opts);
 
   sessions.set(sessionId, {
@@ -176,6 +248,15 @@ async function startSingle(platform: Platform, appId: string, opts: Record<strin
     primaryDriver: driver,
     primaryPlatform: platform,
     primaryApp: appId,
+  });
+
+  // Save session for reconnection
+  saveSession(sessionId, {
+    mode: "single",
+    primarySessionId: driver.sessionId,
+    primaryPlatform: platform,
+    primaryApp: appId,
+    port,
   });
 
   console.log(JSON.stringify({ sessionId, status: "started", mode: "single", platform }));
@@ -210,6 +291,18 @@ async function startParityMigration(
     secondaryApp: newApp,
   });
 
+  // Save session for reconnection
+  saveSession(sessionId, {
+    mode: "parity-migration",
+    primarySessionId: primaryDriver.sessionId,
+    secondarySessionId: secondaryDriver.sessionId,
+    primaryPlatform: platform,
+    secondaryPlatform: platform,
+    primaryApp: oldApp,
+    secondaryApp: newApp,
+    port: parseInt(opts.port || String(appiumPort), 10),
+  });
+
   console.log(JSON.stringify({
     sessionId,
     status: "started",
@@ -240,6 +333,18 @@ async function startParityCross(iosBundleId: string, androidPackage: string, opt
     secondaryApp: androidPackage,
   });
 
+  // Save session for reconnection
+  saveSession(sessionId, {
+    mode: "parity-cross",
+    primarySessionId: iosDriver.sessionId,
+    secondarySessionId: androidDriver.sessionId,
+    primaryPlatform: "ios",
+    secondaryPlatform: "android",
+    primaryApp: iosBundleId,
+    secondaryApp: androidPackage,
+    port: parseInt(opts.port || String(appiumPort), 10),
+  });
+
   console.log(JSON.stringify({
     sessionId,
     status: "started",
@@ -266,8 +371,7 @@ async function captureDriver(driver: Browser, platform: Platform, tmpDir: string
 }
 
 async function capture(sessionId: string): Promise<CaptureResult> {
-  const session = sessions.get(sessionId);
-  if (!session) throw new Error(`Session ${sessionId} not found`);
+  const session = await getSession(sessionId);
 
   const tmpDir = `/tmp/mobile-${sessionId}`;
   fs.mkdirSync(tmpDir, { recursive: true });
@@ -411,8 +515,7 @@ async function performAction(driver: Browser, platform: Platform, action: Action
 }
 
 async function executeAction(sessionId: string, action: ActionPayload): Promise<ActionResult> {
-  const session = sessions.get(sessionId);
-  if (!session) throw new Error(`Session ${sessionId} not found`);
+  const session = await getSession(sessionId);
 
   if (session.mode === "single") {
     const result = await performAction(session.primaryDriver, session.primaryPlatform, action);
@@ -447,28 +550,15 @@ async function closeSession(session: Session): Promise<void> {
 }
 
 async function stop(sessionId: string): Promise<void> {
-  const session = sessions.get(sessionId);
-  if (!session) throw new Error(`Session ${sessionId} not found`);
+  const session = await getSession(sessionId);
 
   await closeSession(session);
   sessions.delete(sessionId);
+  deleteSessionFile(sessionId);
   console.log(JSON.stringify({ sessionId, status: "stopped" }));
 }
 
-async function cleanup() {
-  for (const [, session] of sessions) {
-    await closeSession(session);
-  }
-  sessions.clear();
-
-  if (appiumProcess) {
-    appiumProcess.kill();
-    appiumProcess = null;
-  }
-}
-
-process.on("SIGINT", async () => { await cleanup(); process.exit(0); });
-process.on("SIGTERM", async () => { await cleanup(); process.exit(0); });
+// Note: We don't kill Appium or sessions on exit - they persist for reconnection
 
 async function main() {
   const [, , command, ...args] = process.argv;
