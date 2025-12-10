@@ -29,7 +29,7 @@ claude plugin install mobile@paddo-tools
 | **codex** | OpenAI Codex for architecture analysis and code review (`/codex:review`) |
 | **dns** | Manage DNS records (`/dns:spaceship`, `/dns:godaddy`) |
 | **headless** | Headless browser automation for site comparison and E2E testing (`/headless:parity`, `/headless:test`) |
-| **mobile** | Native mobile app testing - E2E and cross-platform parity (`/mobile:test`, `/mobile:parity`) |
+| **mobile** | Mobile app testing for iOS, Android, React Native, Xamarin, Flutter (`/mobile:test`, `/mobile:parity`) |
 
 ### Headless in action
 
