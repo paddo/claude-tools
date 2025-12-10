@@ -167,33 +167,18 @@ async function createDriver(platform: Platform, appId: string, opts: Record<stri
 }
 
 // Single app testing
-async function startIos(bundleId: string, opts: Record<string, string>): Promise<string> {
+async function startSingle(platform: Platform, appId: string, opts: Record<string, string>): Promise<string> {
   const sessionId = generateSessionId();
-  const driver = await createDriver("ios", bundleId, opts);
+  const driver = await createDriver(platform, appId, opts);
 
   sessions.set(sessionId, {
     mode: "single",
     primaryDriver: driver,
-    primaryPlatform: "ios",
-    primaryApp: bundleId,
+    primaryPlatform: platform,
+    primaryApp: appId,
   });
 
-  console.log(JSON.stringify({ sessionId, status: "started", mode: "single", platform: "ios" }));
-  return sessionId;
-}
-
-async function startAndroid(packageName: string, opts: Record<string, string>): Promise<string> {
-  const sessionId = generateSessionId();
-  const driver = await createDriver("android", packageName, opts);
-
-  sessions.set(sessionId, {
-    mode: "single",
-    primaryDriver: driver,
-    primaryPlatform: "android",
-    primaryApp: packageName,
-  });
-
-  console.log(JSON.stringify({ sessionId, status: "started", mode: "single", platform: "android" }));
+  console.log(JSON.stringify({ sessionId, status: "started", mode: "single", platform }));
   return sessionId;
 }
 
@@ -367,23 +352,11 @@ async function performAction(driver: Browser, platform: Platform, action: Action
         if (platform === "android") {
           await driver.back();
         } else {
-          // iOS: try to find back button or swipe from edge
-          try {
-            const backBtn = await driver.$("~Back");
-            if (await backBtn.isExisting()) {
-              await backBtn.click();
-            } else {
-              // Swipe from left edge
-              const { height } = await driver.getWindowSize();
-              await driver.action("pointer", { parameters: { pointerType: "touch" } })
-                .move({ x: 5, y: Math.round(height / 2) })
-                .down()
-                .move({ x: 200, y: Math.round(height / 2), duration: 200 })
-                .up()
-                .perform();
-            }
-          } catch {
-            // Fallback: swipe gesture
+          // iOS: try back button first, fallback to edge swipe
+          const backBtn = await driver.$("~Back").catch(() => null);
+          if (backBtn && await backBtn.isExisting().catch(() => false)) {
+            await backBtn.click();
+          } else {
             const { height } = await driver.getWindowSize();
             await driver.action("pointer", { parameters: { pointerType: "touch" } })
               .move({ x: 5, y: Math.round(height / 2) })
@@ -466,26 +439,25 @@ async function executeAction(sessionId: string, action: ActionPayload): Promise<
   return output;
 }
 
-async function stop(sessionId: string): Promise<void> {
-  const session = sessions.get(sessionId);
-  if (!session) throw new Error(`Session ${sessionId} not found`);
-
+async function closeSession(session: Session): Promise<void> {
   await session.primaryDriver.deleteSession().catch(() => {});
   if (session.secondaryDriver) {
     await session.secondaryDriver.deleteSession().catch(() => {});
   }
+}
 
+async function stop(sessionId: string): Promise<void> {
+  const session = sessions.get(sessionId);
+  if (!session) throw new Error(`Session ${sessionId} not found`);
+
+  await closeSession(session);
   sessions.delete(sessionId);
   console.log(JSON.stringify({ sessionId, status: "stopped" }));
 }
 
-// Cleanup on exit
 async function cleanup() {
   for (const [, session] of sessions) {
-    await session.primaryDriver.deleteSession().catch(() => {});
-    if (session.secondaryDriver) {
-      await session.secondaryDriver.deleteSession().catch(() => {});
-    }
+    await closeSession(session);
   }
   sessions.clear();
 
@@ -510,7 +482,7 @@ async function main() {
           console.error("Usage: driver.ts start-ios <bundle-id> [--udid=<simulator>] [--flutter]");
           process.exit(1);
         }
-        await startIos(positional[0], opts);
+        await startSingle("ios", positional[0], opts);
         break;
 
       case "start-android":
@@ -518,7 +490,7 @@ async function main() {
           console.error("Usage: driver.ts start-android <package[/activity]> [--serial=<device>] [--flutter]");
           process.exit(1);
         }
-        await startAndroid(positional[0], opts);
+        await startSingle("android", positional[0], opts);
         break;
 
       case "start-parity-migration":
