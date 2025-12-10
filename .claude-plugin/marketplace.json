@@ -1,6 +1,6 @@
 {
   "name": "paddo-tools",
-  "description": "Collection of Claude Code plugins for DNS management, AI-assisted architecture, visual design, and framework migration",
+  "description": "Collection of Claude Code plugins for DNS management, AI-assisted architecture, visual design, testing, and framework migration",
   "owner": {
     "name": "paddo"
   },
@@ -24,6 +24,11 @@
       "name": "headless",
       "source": "./plugins/headless",
       "description": "Headless browser automation for site comparison and E2E testing"
+    },
+    {
+      "name": "mobile",
+      "source": "./plugins/mobile",
+      "description": "Native mobile app testing - E2E and cross-platform parity (iOS/Android)"
     }
   ]
 }

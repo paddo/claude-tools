@@ -1,0 +1,8 @@
+{
+  "name": "mobile",
+  "version": "0.1.0",
+  "description": "Native mobile app testing - E2E and cross-platform parity",
+  "author": {
+    "name": "paddo"
+  }
+}
