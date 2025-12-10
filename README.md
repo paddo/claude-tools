@@ -10,6 +10,7 @@ claude plugin install gemini-tools@paddo-tools
 claude plugin install codex@paddo-tools
 claude plugin install dns@paddo-tools
 claude plugin install headless@paddo-tools
+claude plugin install mobile@paddo-tools
 
 # or via slash command
 /plugin marketplace add paddo/claude-tools
@@ -17,6 +18,7 @@ claude plugin install headless@paddo-tools
 /plugin install codex@paddo-tools
 /plugin install dns@paddo-tools
 /plugin install headless@paddo-tools
+/plugin install mobile@paddo-tools
 ```
 
 ## Plugins
@@ -27,6 +29,7 @@ claude plugin install headless@paddo-tools
 | **codex** | OpenAI Codex for architecture analysis and code review (`/codex:review`) |
 | **dns** | Manage DNS records (`/dns:spaceship`, `/dns:godaddy`) |
 | **headless** | Headless browser automation for site comparison and E2E testing (`/headless:parity`, `/headless:test`) |
+| **mobile** | Native mobile app testing - E2E and cross-platform parity (`/mobile:test`, `/mobile:parity`) |
 
 ### Headless in action
 
