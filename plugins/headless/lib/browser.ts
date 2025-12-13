@@ -10,6 +10,7 @@ interface Session {
   migratedPage?: Page;
   legacyBase: string;
   migratedBase?: string;
+  videoDir?: string;
 }
 
 interface ActionPayload {
@@ -49,12 +50,22 @@ const consoleMessages = new Map<string, { legacy: string[]; migrated: string[] }
 let browser: Browser | null = null;
 
 // Single-site mode
-async function startSingle(url: string): Promise<string> {
+async function startSingle(url: string, recordVideo = false): Promise<string> {
   const b = await getBrowser();
   const sessionId = generateSessionId();
 
   const viewport = { width: 1280, height: 720 };
-  const context = await b.newContext({ viewport });
+  const videoDir = recordVideo ? `/tmp/headless-video-${sessionId}` : undefined;
+
+  if (videoDir) {
+    fs.mkdirSync(videoDir, { recursive: true });
+  }
+
+  const contextOptions = videoDir
+    ? { viewport, recordVideo: { dir: videoDir, size: viewport } }
+    : { viewport };
+
+  const context = await b.newContext(contextOptions);
   const page = await context.newPage();
 
   consoleMessages.set(sessionId, { legacy: [], migrated: [] });
@@ -70,15 +81,16 @@ async function startSingle(url: string): Promise<string> {
     legacyContext: context,
     legacyPage: page,
     legacyBase: new URL(url).origin,
+    videoDir,
   });
 
-  console.log(JSON.stringify({ sessionId, status: "started", mode: "single" }));
+  console.log(JSON.stringify({ sessionId, status: "started", mode: "single", videoEnabled: recordVideo }));
   return sessionId;
 }
 
 // Cleanup on exit
 async function cleanup() {
-  for (const [id, session] of sessions) {
+  for (const [, session] of sessions) {
     await session.legacyContext.close().catch(() => {});
     if (session.migratedContext) {
       await session.migratedContext.close().catch(() => {});
@@ -106,13 +118,23 @@ function generateSessionId(): string {
   return `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-async function start(legacyUrl: string, migratedUrl: string): Promise<string> {
+async function start(legacyUrl: string, migratedUrl: string, recordVideo = false): Promise<string> {
   const b = await getBrowser();
   const sessionId = generateSessionId();
 
   const viewport = { width: 1280, height: 720 };
-  const legacyContext = await b.newContext({ viewport });
-  const migratedContext = await b.newContext({ viewport });
+  const videoDir = recordVideo ? `/tmp/headless-video-${sessionId}` : undefined;
+
+  if (videoDir) {
+    fs.mkdirSync(videoDir, { recursive: true });
+  }
+
+  const contextOptions = videoDir
+    ? { viewport, recordVideo: { dir: videoDir, size: viewport } }
+    : { viewport };
+
+  const legacyContext = await b.newContext(contextOptions);
+  const migratedContext = await b.newContext(contextOptions);
 
   const legacyPage = await legacyContext.newPage();
   const migratedPage = await migratedContext.newPage();
@@ -137,9 +159,10 @@ async function start(legacyUrl: string, migratedUrl: string): Promise<string> {
     migratedPage,
     legacyBase: new URL(legacyUrl).origin,
     migratedBase: new URL(migratedUrl).origin,
+    videoDir,
   });
 
-  console.log(JSON.stringify({ sessionId, status: "started", mode: "parity" }));
+  console.log(JSON.stringify({ sessionId, status: "started", mode: "parity", videoEnabled: recordVideo }));
   return sessionId;
 }
 
@@ -178,12 +201,9 @@ async function capture(sessionId: string): Promise<CaptureResult> {
   const legacyDomPath = path.join(tmpDir, "legacy-dom.html");
   const migratedDomPath = path.join(tmpDir, "migrated-dom.html");
 
-  await Promise.all([
+  const [, , legacyContent, migratedContent] = await Promise.all([
     session.legacyPage.screenshot({ path: legacyScreenshot, fullPage: false, type: "jpeg", quality: 50, scale: "css" }),
     session.migratedPage!.screenshot({ path: migratedScreenshot, fullPage: false, type: "jpeg", quality: 50, scale: "css" }),
-  ]);
-
-  const [legacyContent, migratedContent] = await Promise.all([
     session.legacyPage.content(),
     session.migratedPage!.content(),
   ]);
@@ -300,10 +320,33 @@ async function stop(sessionId: string): Promise<void> {
   const session = sessions.get(sessionId);
   if (!session) throw new Error(`Session ${sessionId} not found`);
 
+  // Get video references before closing
+  const legacyVideoHandle = session.legacyPage.video();
+  const migratedVideoHandle = session.migratedPage?.video();
+
+  // Close contexts (this finalizes videos)
   await session.legacyContext.close();
   if (session.migratedContext) {
     await session.migratedContext.close();
   }
+
+  // Get paths after close when videos are finalized, rename to predictable names
+  let legacyVideoPath: string | undefined;
+  let migratedVideoPath: string | undefined;
+
+  if (session.videoDir) {
+    if (legacyVideoHandle) {
+      const tmpPath = await legacyVideoHandle.path();
+      legacyVideoPath = path.join(session.videoDir, session.mode === "single" ? "video.webm" : "legacy.webm");
+      fs.renameSync(tmpPath, legacyVideoPath);
+    }
+    if (migratedVideoHandle) {
+      const tmpPath = await migratedVideoHandle.path();
+      migratedVideoPath = path.join(session.videoDir, "migrated.webm");
+      fs.renameSync(tmpPath, migratedVideoPath);
+    }
+  }
+
   sessions.delete(sessionId);
   consoleMessages.delete(sessionId);
 
@@ -312,7 +355,12 @@ async function stop(sessionId: string): Promise<void> {
     browser = null;
   }
 
-  console.log(JSON.stringify({ sessionId, status: "stopped" }));
+  console.log(JSON.stringify({
+    sessionId,
+    status: "stopped",
+    ...(legacyVideoPath && { video: legacyVideoPath }),
+    ...(migratedVideoPath && { legacyVideo: legacyVideoPath, migratedVideo: migratedVideoPath }),
+  }));
 }
 
 async function main() {
@@ -321,18 +369,22 @@ async function main() {
   switch (command) {
     case "start":
       if (args.length < 2) {
-        console.error("Usage: browser.ts start <legacy-url> <migrated-url>");
+        console.error("Usage: browser.ts start <legacy-url> <migrated-url> [--video]");
         process.exit(1);
       }
-      await start(args[0], args[1]);
+      const recordVideo = args.includes("--video");
+      const urls = args.filter(a => !a.startsWith("--"));
+      await start(urls[0], urls[1], recordVideo);
       break;
 
     case "start-single":
       if (args.length < 1) {
-        console.error("Usage: browser.ts start-single <url>");
+        console.error("Usage: browser.ts start-single <url> [--video]");
         process.exit(1);
       }
-      await startSingle(args[0]);
+      const recordSingleVideo = args.includes("--video");
+      const singleUrls = args.filter(a => !a.startsWith("--"));
+      await startSingle(singleUrls[0], recordSingleVideo);
       break;
 
     case "capture":

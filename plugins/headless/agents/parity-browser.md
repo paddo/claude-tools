@@ -32,13 +32,16 @@ Replace `/path/to/lib` with the actual path from the find command above:
 # Start session - returns session ID
 npx --prefix /path/to/lib tsx /path/to/lib/browser.ts start <legacy-url> <migrated-url>
 
+# Start session with video recording (for temporal bugs like flickering)
+npx --prefix /path/to/lib tsx /path/to/lib/browser.ts start <legacy-url> <migrated-url> --video
+
 # Capture state - screenshots + DOM to temp files
 npx --prefix /path/to/lib tsx /path/to/lib/browser.ts capture <session-id>
 
 # Execute action on both browsers
 npx --prefix /path/to/lib tsx /path/to/lib/browser.ts action <session-id> '<action-json>'
 
-# End session
+# End session (returns video paths if --video was used)
 npx --prefix /path/to/lib tsx /path/to/lib/browser.ts stop <session-id>
 ```
 
@@ -76,6 +79,16 @@ Look for:
 - Behavioral differences (interactions not working)
 - Content differences (text, images)
 - Console errors in migrated but not legacy
+
+## When to Use Video Recording
+
+Use `--video` flag when testing for:
+- **Flickering**: Elements that intermittently appear/disappear
+- **Animation issues**: Transitions, loading states, spinners
+- **Race conditions**: Content that loads in wrong order
+- **Timing bugs**: Things that look fine in screenshots but break in motion
+
+Video files are saved to `/tmp/headless-video-{session-id}/` and paths are returned when you run `stop`.
 
 ## Output Format
 

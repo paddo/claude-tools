@@ -15,6 +15,7 @@ The user will provide:
 - **Legacy URL**: The original site (source of truth)
 - **Migrated URL**: The converted site (being validated)
 - **Pages/flows to test** (optional): specific pages or user flows
+- **--video** (optional): enable video recording for temporal bugs (flickering, animations)
 
 ## Parallel Execution Strategy
 
