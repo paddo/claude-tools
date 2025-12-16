@@ -34,6 +34,11 @@
       "name": "miro",
       "source": "./plugins/miro",
       "description": "Read and interpret Miro boards"
+    },
+    {
+      "name": "teams",
+      "source": "./plugins/teams",
+      "description": "Read Microsoft Teams chats"
     }
   ]
 }

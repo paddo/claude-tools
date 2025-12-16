@@ -1,0 +1,8 @@
+{
+  "name": "teams",
+  "version": "1.0.0",
+  "description": "Read Microsoft Teams chats",
+  "author": {
+    "name": "paddo"
+  }
+}
