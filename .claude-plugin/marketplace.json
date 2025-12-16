@@ -29,6 +29,11 @@
       "name": "mobile",
       "source": "./plugins/mobile",
       "description": "Native mobile app testing - E2E and cross-platform parity (iOS/Android)"
+    },
+    {
+      "name": "miro",
+      "source": "./plugins/miro",
+      "description": "Read and interpret Miro boards"
     }
   ]
 }
