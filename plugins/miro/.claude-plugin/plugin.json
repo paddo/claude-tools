@@ -1,0 +1,8 @@
+{
+  "name": "miro",
+  "version": "1.0.0",
+  "description": "Read and interpret Miro boards",
+  "author": {
+    "name": "paddo"
+  }
+}
