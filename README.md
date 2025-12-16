@@ -11,6 +11,7 @@ claude plugin install codex@paddo-tools
 claude plugin install dns@paddo-tools
 claude plugin install headless@paddo-tools
 claude plugin install mobile@paddo-tools
+claude plugin install miro@paddo-tools
 
 # or via slash command
 /plugin marketplace add paddo/claude-tools
@@ -19,6 +20,7 @@ claude plugin install mobile@paddo-tools
 /plugin install dns@paddo-tools
 /plugin install headless@paddo-tools
 /plugin install mobile@paddo-tools
+/plugin install miro@paddo-tools
 ```
 
 ## Plugins
@@ -30,6 +32,7 @@ claude plugin install mobile@paddo-tools
 | **dns** | Manage DNS records (`/dns:spaceship`, `/dns:godaddy`) |
 | **headless** | Headless browser automation for site comparison and E2E testing (`/headless:parity`, `/headless:test`) |
 | **mobile** | Mobile app testing for iOS, Android, React Native, Xamarin, Flutter (`/mobile:test`, `/mobile:parity`) |
+| **miro** | Read and interpret Miro boards (`/miro:board`) |
 
 ### Headless in action
 
@@ -73,7 +76,8 @@ Plugins need API keys. Set them via:
     "SPACESHIP_API_KEY": "...",
     "SPACESHIP_API_SECRET": "...",
     "GODADDY_API_KEY": "...",
-    "GODADDY_API_SECRET": "..."
+    "GODADDY_API_SECRET": "...",
+    "MIRO_TOKEN": "..."
   }
 }
 ```
