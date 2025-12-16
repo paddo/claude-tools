@@ -80,7 +80,9 @@ Plugins need API keys. Set them via:
     "SPACESHIP_API_SECRET": "...",
     "GODADDY_API_KEY": "...",
     "GODADDY_API_SECRET": "...",
-    "MIRO_TOKEN": "..."
+    "MIRO_TOKEN": "...",
+    "TEAMS_CLIENT_ID": "...",
+    "TEAMS_TENANT_ID": "..."
   }
 }
 ```
