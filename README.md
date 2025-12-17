@@ -12,7 +12,6 @@ claude plugin install dns@paddo-tools
 claude plugin install headless@paddo-tools
 claude plugin install mobile@paddo-tools
 claude plugin install miro@paddo-tools
-claude plugin install teams@paddo-tools
 
 # or via slash command
 /plugin marketplace add paddo/claude-tools
@@ -22,7 +21,6 @@ claude plugin install teams@paddo-tools
 /plugin install headless@paddo-tools
 /plugin install mobile@paddo-tools
 /plugin install miro@paddo-tools
-/plugin install teams@paddo-tools
 ```
 
 ## Plugins
@@ -35,7 +33,6 @@ claude plugin install teams@paddo-tools
 | **headless** | Headless browser automation for site comparison and E2E testing (`/headless:parity`, `/headless:test`) |
 | **mobile** | Mobile app testing for iOS, Android, React Native, Xamarin, Flutter (`/mobile:test`, `/mobile:parity`) |
 | **miro** | Read and interpret Miro boards (`/miro:board`) |
-| **teams** | Read Microsoft Teams chats (`/teams:chat`) |
 
 ### Headless in action
 
@@ -80,9 +77,7 @@ Plugins need API keys. Set them via:
     "SPACESHIP_API_SECRET": "...",
     "GODADDY_API_KEY": "...",
     "GODADDY_API_SECRET": "...",
-    "MIRO_TOKEN": "...",
-    "TEAMS_CLIENT_ID": "...",
-    "TEAMS_TENANT_ID": "..."
+    "MIRO_TOKEN": "..."
   }
 }
 ```
