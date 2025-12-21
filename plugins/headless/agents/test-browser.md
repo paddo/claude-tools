@@ -11,35 +11,47 @@ You control a single Playwright browser session for E2E testing with AI-driven v
 
 ## Setup
 
-First, find the lib path and set it as a variable. Run this ONCE at the start:
+First, find the lib path. Run this ONCE at the start:
 ```bash
-find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null
+find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null | head -1
 ```
 
-This will output a path like `/Users/you/.claude/plugins/headless@paddo-tools/lib/browser.ts`.
-Use the directory containing browser.ts as HEADLESS_LIB for all subsequent commands.
+This outputs a path like `/Users/you/.claude/plugins/headless@paddo-tools/lib/browser.ts`.
+Store this as `LIB` for all subsequent commands.
 
-Check/install deps if first run (replace the path):
+Check/install deps if first run:
 ```bash
-cd /path/to/lib && ls node_modules 2>/dev/null || npm install && npx playwright install chromium
+cd $(dirname $LIB) && ls node_modules 2>/dev/null || npm install && npx playwright install chromium
 ```
+
+## IMPORTANT: Process Management
+
+This tool uses a persistent server to manage browser sessions. Each command you run communicates with the same server process.
+
+**Startup**: The server auto-starts when you run `start-single` if not already running.
+
+**Cleanup**: ALWAYS run `shutdown` when done to kill the server and free resources. Failing to do this will leave zombie processes.
 
 ## Browser Commands
 
-Replace `/path/to/lib` with the actual path from the find command above:
-
 ```bash
-# Start single-site session - returns session ID
-npx --prefix /path/to/lib tsx /path/to/lib/browser.ts start-single <url>
+# Start session - returns session ID
+npx --prefix $(dirname $LIB) tsx $LIB start-single <url>
 
 # Capture state - screenshot + DOM to temp files
-npx --prefix /path/to/lib tsx /path/to/lib/browser.ts capture <session-id>
+npx --prefix $(dirname $LIB) tsx $LIB capture <session-id>
 
 # Execute action
-npx --prefix /path/to/lib tsx /path/to/lib/browser.ts action <session-id> '<action-json>'
+npx --prefix $(dirname $LIB) tsx $LIB action <session-id> '<action-json>'
 
-# End session
-npx --prefix /path/to/lib tsx /path/to/lib/browser.ts stop <session-id>
+# End session (stops browser, keeps server)
+npx --prefix $(dirname $LIB) tsx $LIB stop <session-id>
+
+# Check active sessions
+npx --prefix $(dirname $LIB) tsx $LIB status
+
+# Shutdown server completely (ALWAYS do this when done)
+npx --prefix $(dirname $LIB) tsx $LIB shutdown
 ```
 
 ## Action JSON Format
@@ -67,7 +79,8 @@ Do:
 2. Perform each step, capturing state after key actions
 3. View screenshots to validate expected behavior
 4. Report PASS/FAIL based on whether expectations are met
-5. **ALWAYS stop session** - even if errors occur, run `stop` command to cleanup
+5. **Stop the session** with `stop <session-id>`
+6. **ALWAYS shutdown server** - run `shutdown` to cleanup
 
 ## Validation Approach
 

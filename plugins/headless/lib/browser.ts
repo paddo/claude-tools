@@ -1,6 +1,9 @@
 import { chromium, Browser, Page, BrowserContext } from "playwright";
 import * as fs from "fs";
 import * as path from "path";
+import * as http from "http";
+import * as readline from "readline";
+import { spawn } from "child_process";
 
 interface Session {
   mode: "parity" | "single";
@@ -26,7 +29,6 @@ interface CaptureResult {
   screenshot: string;
   dom: string;
   console: string[];
-  // Parity mode only
   legacyScreenshot?: string;
   migratedScreenshot?: string;
   legacyDom?: string;
@@ -38,7 +40,6 @@ interface CaptureResult {
 interface ActionResult {
   success: boolean;
   error?: string;
-  // Parity mode only
   legacySuccess?: boolean;
   migratedSuccess?: boolean;
   legacyError?: string;
@@ -49,7 +50,19 @@ const sessions = new Map<string, Session>();
 const consoleMessages = new Map<string, { legacy: string[]; migrated: string[] }>();
 let browser: Browser | null = null;
 
-// Single-site mode
+const SOCKET_PATH = "/tmp/headless-browser.sock";
+
+async function getBrowser(): Promise<Browser> {
+  if (!browser) {
+    browser = await chromium.launch({ headless: true });
+  }
+  return browser;
+}
+
+function generateSessionId(): string {
+  return `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 async function startSingle(url: string, recordVideo = false): Promise<string> {
   const b = await getBrowser();
   const sessionId = generateSessionId();
@@ -84,38 +97,7 @@ async function startSingle(url: string, recordVideo = false): Promise<string> {
     videoDir,
   });
 
-  console.log(JSON.stringify({ sessionId, status: "started", mode: "single", videoEnabled: recordVideo }));
   return sessionId;
-}
-
-// Cleanup on exit
-async function cleanup() {
-  for (const [, session] of sessions) {
-    await session.legacyContext.close().catch(() => {});
-    if (session.migratedContext) {
-      await session.migratedContext.close().catch(() => {});
-    }
-  }
-  sessions.clear();
-  if (browser) {
-    await browser.close().catch(() => {});
-    browser = null;
-  }
-}
-
-process.on("SIGINT", async () => { await cleanup(); process.exit(0); });
-process.on("SIGTERM", async () => { await cleanup(); process.exit(0); });
-process.on("exit", () => { cleanup(); });
-
-async function getBrowser(): Promise<Browser> {
-  if (!browser) {
-    browser = await chromium.launch({ headless: true });
-  }
-  return browser;
-}
-
-function generateSessionId(): string {
-  return `session-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 async function start(legacyUrl: string, migratedUrl: string, recordVideo = false): Promise<string> {
@@ -162,7 +144,6 @@ async function start(legacyUrl: string, migratedUrl: string, recordVideo = false
     videoDir,
   });
 
-  console.log(JSON.stringify({ sessionId, status: "started", mode: "parity", videoEnabled: recordVideo }));
   return sessionId;
 }
 
@@ -175,7 +156,6 @@ async function capture(sessionId: string): Promise<CaptureResult> {
 
   const msgs = consoleMessages.get(sessionId) || { legacy: [], migrated: [] };
 
-  // Single-site mode
   if (session.mode === "single") {
     const screenshotPath = path.join(tmpDir, "screenshot.jpg");
     const domPath = path.join(tmpDir, "dom.html");
@@ -191,11 +171,9 @@ async function capture(sessionId: string): Promise<CaptureResult> {
     };
 
     msgs.legacy = [];
-    console.log(JSON.stringify(result));
     return result;
   }
 
-  // Parity mode
   const legacyScreenshot = path.join(tmpDir, "legacy.jpg");
   const migratedScreenshot = path.join(tmpDir, "migrated.jpg");
   const legacyDomPath = path.join(tmpDir, "legacy-dom.html");
@@ -226,7 +204,6 @@ async function capture(sessionId: string): Promise<CaptureResult> {
   msgs.legacy = [];
   msgs.migrated = [];
 
-  console.log(JSON.stringify(result));
   return result;
 }
 
@@ -280,20 +257,16 @@ async function executeAction(sessionId: string, action: ActionPayload): Promise<
     }
   };
 
-  // Single-site mode
   if (session.mode === "single") {
     const actionResult = await performAction(session.legacyPage, session.legacyBase);
     await session.legacyPage.waitForLoadState("networkidle").catch(() => {});
 
-    const result: ActionResult = {
+    return {
       success: actionResult.success,
       error: actionResult.error,
     };
-    console.log(JSON.stringify(result));
-    return result;
   }
 
-  // Parity mode
   const [legacyResult, migratedResult] = await Promise.all([
     performAction(session.legacyPage, session.legacyBase),
     performAction(session.migratedPage!, session.migratedBase!),
@@ -304,33 +277,27 @@ async function executeAction(sessionId: string, action: ActionPayload): Promise<
     session.migratedPage!.waitForLoadState("networkidle").catch(() => {}),
   ]);
 
-  const result: ActionResult = {
+  return {
     success: legacyResult.success && migratedResult.success,
     legacySuccess: legacyResult.success,
     migratedSuccess: migratedResult.success,
     legacyError: legacyResult.error,
     migratedError: migratedResult.error,
   };
-
-  console.log(JSON.stringify(result));
-  return result;
 }
 
-async function stop(sessionId: string): Promise<void> {
+async function stop(sessionId: string): Promise<{ video?: string; legacyVideo?: string; migratedVideo?: string }> {
   const session = sessions.get(sessionId);
   if (!session) throw new Error(`Session ${sessionId} not found`);
 
-  // Get video references before closing
   const legacyVideoHandle = session.legacyPage.video();
   const migratedVideoHandle = session.migratedPage?.video();
 
-  // Close contexts (this finalizes videos)
   await session.legacyContext.close();
   if (session.migratedContext) {
     await session.migratedContext.close();
   }
 
-  // Get paths after close when videos are finalized, rename to predictable names
   let legacyVideoPath: string | undefined;
   let migratedVideoPath: string | undefined;
 
@@ -355,66 +322,273 @@ async function stop(sessionId: string): Promise<void> {
     browser = null;
   }
 
-  console.log(JSON.stringify({
-    sessionId,
-    status: "stopped",
+  return {
     ...(legacyVideoPath && { video: legacyVideoPath }),
     ...(migratedVideoPath && { legacyVideo: legacyVideoPath, migratedVideo: migratedVideoPath }),
-  }));
+  };
+}
+
+async function cleanup() {
+  for (const [, session] of sessions) {
+    await session.legacyContext.close().catch(() => {});
+    if (session.migratedContext) {
+      await session.migratedContext.close().catch(() => {});
+    }
+  }
+  sessions.clear();
+  if (browser) {
+    await browser.close().catch(() => {});
+    browser = null;
+  }
+}
+
+// Server mode - persistent process that handles all commands via Unix socket
+async function startServer() {
+  // Clean up stale socket
+  if (fs.existsSync(SOCKET_PATH)) {
+    fs.unlinkSync(SOCKET_PATH);
+  }
+
+  const server = http.createServer(async (req, res) => {
+    if (req.method !== "POST") {
+      res.writeHead(405);
+      res.end(JSON.stringify({ error: "Method not allowed" }));
+      return;
+    }
+
+    let body = "";
+    req.on("data", (chunk) => (body += chunk));
+    req.on("end", async () => {
+      try {
+        const { command, args } = JSON.parse(body);
+        let result: unknown;
+
+        switch (command) {
+          case "start":
+            result = { sessionId: await start(args.legacyUrl, args.migratedUrl, args.video), status: "started", mode: "parity" };
+            break;
+          case "start-single":
+            result = { sessionId: await startSingle(args.url, args.video), status: "started", mode: "single" };
+            break;
+          case "capture":
+            result = await capture(args.sessionId);
+            break;
+          case "action":
+            result = await executeAction(args.sessionId, args.action);
+            break;
+          case "stop":
+            const stopResult = await stop(args.sessionId);
+            result = { sessionId: args.sessionId, status: "stopped", ...stopResult };
+            break;
+          case "status":
+            result = { sessions: Array.from(sessions.keys()), browserActive: !!browser };
+            break;
+          case "shutdown":
+            await cleanup();
+            result = { status: "shutdown" };
+            setTimeout(() => process.exit(0), 100);
+            break;
+          default:
+            throw new Error(`Unknown command: ${command}`);
+        }
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(result));
+      } catch (err) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: String(err) }));
+      }
+    });
+  });
+
+  server.listen(SOCKET_PATH, () => {
+    console.log(JSON.stringify({ status: "server-started", socket: SOCKET_PATH }));
+  });
+
+  process.on("SIGINT", async () => { await cleanup(); process.exit(0); });
+  process.on("SIGTERM", async () => { await cleanup(); process.exit(0); });
+}
+
+// Client mode - send command to running server
+async function sendCommand(command: string, args: Record<string, unknown>): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const req = http.request(
+      { socketPath: SOCKET_PATH, path: "/", method: "POST", headers: { "Content-Type": "application/json" } },
+      (res) => {
+        let data = "";
+        res.on("data", (chunk) => (data += chunk));
+        res.on("end", () => {
+          console.log(data);
+          resolve();
+        });
+      }
+    );
+    req.on("error", (err) => {
+      if ((err as NodeJS.ErrnoException).code === "ECONNREFUSED" || (err as NodeJS.ErrnoException).code === "ENOENT") {
+        console.error(JSON.stringify({ error: "Server not running. Start with: browser.ts server" }));
+      } else {
+        console.error(JSON.stringify({ error: String(err) }));
+      }
+      reject(err);
+    });
+    req.write(JSON.stringify({ command, args }));
+    req.end();
+  });
+}
+
+// Auto-start server as detached background process
+async function autoStartServer(): Promise<void> {
+  // Get the directory where browser.ts lives
+  const libDir = path.dirname(new URL(import.meta.url).pathname);
+  const browserScript = path.join(libDir, "browser.ts");
+
+  // Use npx tsx to run the server
+  const child = spawn("npx", ["--prefix", libDir, "tsx", browserScript, "server"], {
+    detached: true,
+    stdio: "ignore",
+    cwd: libDir,
+  });
+  child.unref();
+
+  // Wait for socket to appear (up to 5 seconds)
+  for (let i = 0; i < 50; i++) {
+    if (fs.existsSync(SOCKET_PATH)) {
+      return;
+    }
+    await new Promise(r => setTimeout(r, 100));
+  }
+  throw new Error("Server failed to start within 5 seconds");
+}
+
+// Legacy CLI mode - for backwards compatibility, runs single command then exits
+// This starts an ephemeral session that doesn't require server
+async function legacyMode(command: string, args: string[]) {
+  try {
+    switch (command) {
+      case "start":
+        if (args.length < 2) {
+          console.error("Usage: browser.ts start <legacy-url> <migrated-url> [--video]");
+          process.exit(1);
+        }
+        const recordVideo = args.includes("--video");
+        const urls = args.filter(a => !a.startsWith("--"));
+        const sessionId = await start(urls[0], urls[1], recordVideo);
+        console.log(JSON.stringify({ sessionId, status: "started", mode: "parity", videoEnabled: recordVideo }));
+
+        // Wait for commands via stdin
+        await waitForStdinCommands();
+        break;
+
+      case "start-single":
+        if (args.length < 1) {
+          console.error("Usage: browser.ts start-single <url> [--video]");
+          process.exit(1);
+        }
+        const recordSingleVideo = args.includes("--video");
+        const singleUrls = args.filter(a => !a.startsWith("--"));
+        const singleSessionId = await startSingle(singleUrls[0], recordSingleVideo);
+        console.log(JSON.stringify({ sessionId: singleSessionId, status: "started", mode: "single", videoEnabled: recordSingleVideo }));
+
+        // Wait for commands via stdin
+        await waitForStdinCommands();
+        break;
+
+      default:
+        console.error("Commands: server, start, start-single, capture, action, stop, status, shutdown");
+        console.error("  server       - Start persistent server (recommended)");
+        console.error("  start-single - Start interactive session (legacy mode)");
+        process.exit(1);
+    }
+  } finally {
+    await cleanup();
+  }
+}
+
+// Wait for commands on stdin (legacy mode)
+async function waitForStdinCommands() {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: false });
+
+  for await (const line of rl) {
+    try {
+      const { command, ...args } = JSON.parse(line);
+      let result: unknown;
+
+      switch (command) {
+        case "capture":
+          result = await capture(args.sessionId);
+          break;
+        case "action":
+          result = await executeAction(args.sessionId, args.action);
+          break;
+        case "stop":
+          const stopResult = await stop(args.sessionId);
+          result = { sessionId: args.sessionId, status: "stopped", ...stopResult };
+          console.log(JSON.stringify(result));
+          return; // Exit after stop
+        default:
+          result = { error: `Unknown command: ${command}` };
+      }
+
+      console.log(JSON.stringify(result));
+    } catch (err) {
+      console.log(JSON.stringify({ error: String(err) }));
+    }
+  }
 }
 
 async function main() {
   const [, , command, ...args] = process.argv;
 
-  switch (command) {
-    case "start":
-      if (args.length < 2) {
-        console.error("Usage: browser.ts start <legacy-url> <migrated-url> [--video]");
-        process.exit(1);
-      }
+  // Server mode
+  if (command === "server") {
+    await startServer();
+    return;
+  }
+
+  // Client commands that talk to server
+  const serverCommands = ["capture", "action", "stop", "status", "shutdown"];
+  if (serverCommands.includes(command)) {
+    switch (command) {
+      case "capture":
+        await sendCommand("capture", { sessionId: args[0] });
+        break;
+      case "action":
+        await sendCommand("action", { sessionId: args[0], action: JSON.parse(args[1]) });
+        break;
+      case "stop":
+        await sendCommand("stop", { sessionId: args[0] });
+        break;
+      case "status":
+        await sendCommand("status", {});
+        break;
+      case "shutdown":
+        await sendCommand("shutdown", {});
+        break;
+    }
+    return;
+  }
+
+  // Check if server is running for start commands
+  if (command === "start" || command === "start-single") {
+    // Auto-start server if not running
+    if (!fs.existsSync(SOCKET_PATH)) {
+      await autoStartServer();
+    }
+
+    if (command === "start") {
       const recordVideo = args.includes("--video");
       const urls = args.filter(a => !a.startsWith("--"));
-      await start(urls[0], urls[1], recordVideo);
-      break;
-
-    case "start-single":
-      if (args.length < 1) {
-        console.error("Usage: browser.ts start-single <url> [--video]");
-        process.exit(1);
-      }
-      const recordSingleVideo = args.includes("--video");
-      const singleUrls = args.filter(a => !a.startsWith("--"));
-      await startSingle(singleUrls[0], recordSingleVideo);
-      break;
-
-    case "capture":
-      if (args.length < 1) {
-        console.error("Usage: browser.ts capture <session-id>");
-        process.exit(1);
-      }
-      await capture(args[0]);
-      break;
-
-    case "action":
-      if (args.length < 2) {
-        console.error("Usage: browser.ts action <session-id> <action-json>");
-        process.exit(1);
-      }
-      await executeAction(args[0], JSON.parse(args[1]));
-      break;
-
-    case "stop":
-      if (args.length < 1) {
-        console.error("Usage: browser.ts stop <session-id>");
-        process.exit(1);
-      }
-      await stop(args[0]);
-      break;
-
-    default:
-      console.error("Commands: start, start-single, capture, action, stop");
-      process.exit(1);
+      await sendCommand("start", { legacyUrl: urls[0], migratedUrl: urls[1], video: recordVideo });
+    } else {
+      const recordVideo = args.includes("--video");
+      const urls = args.filter(a => !a.startsWith("--"));
+      await sendCommand("start-single", { url: urls[0], video: recordVideo });
+    }
+    return;
   }
+
+  console.error("Commands: server, start, start-single, capture, action, stop, status, shutdown");
+  process.exit(1);
 }
 
 main().catch((err) => {

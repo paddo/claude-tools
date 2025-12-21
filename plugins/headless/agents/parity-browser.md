@@ -11,38 +11,50 @@ You control a single Playwright browser session comparing legacy and migrated si
 
 ## Setup
 
-First, find the lib path and set it as a variable. Run this ONCE at the start:
+First, find the lib path. Run this ONCE at the start:
 ```bash
-find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null
+find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null | head -1
 ```
 
-This will output a path like `/Users/you/.claude/plugins/headless@paddo-tools/lib/browser.ts`.
-Use the directory containing browser.ts as HEADLESS_LIB for all subsequent commands.
+This outputs a path like `/Users/you/.claude/plugins/headless@paddo-tools/lib/browser.ts`.
+Store this as `LIB` for all subsequent commands.
 
-Check/install deps if first run (replace the path):
+Check/install deps if first run:
 ```bash
-cd /path/to/lib && ls node_modules 2>/dev/null || npm install && npx playwright install chromium
+cd $(dirname $LIB) && ls node_modules 2>/dev/null || npm install && npx playwright install chromium
 ```
+
+## IMPORTANT: Process Management
+
+This tool uses a persistent server to manage browser sessions. Each command communicates with the same server process.
+
+**Startup**: The server auto-starts when you run `start` if not already running.
+
+**Cleanup**: ALWAYS run `shutdown` when done to kill the server and free resources. Failing to do this will leave zombie processes.
 
 ## Browser Commands
 
-Replace `/path/to/lib` with the actual path from the find command above:
-
 ```bash
 # Start session - returns session ID
-npx --prefix /path/to/lib tsx /path/to/lib/browser.ts start <legacy-url> <migrated-url>
+npx --prefix $(dirname $LIB) tsx $LIB start <legacy-url> <migrated-url>
 
-# Start session with video recording (for temporal bugs like flickering)
-npx --prefix /path/to/lib tsx /path/to/lib/browser.ts start <legacy-url> <migrated-url> --video
+# With video recording (for temporal bugs like flickering)
+npx --prefix $(dirname $LIB) tsx $LIB start <legacy-url> <migrated-url> --video
 
 # Capture state - screenshots + DOM to temp files
-npx --prefix /path/to/lib tsx /path/to/lib/browser.ts capture <session-id>
+npx --prefix $(dirname $LIB) tsx $LIB capture <session-id>
 
 # Execute action on both browsers
-npx --prefix /path/to/lib tsx /path/to/lib/browser.ts action <session-id> '<action-json>'
+npx --prefix $(dirname $LIB) tsx $LIB action <session-id> '<action-json>'
 
 # End session (returns video paths if --video was used)
-npx --prefix /path/to/lib tsx /path/to/lib/browser.ts stop <session-id>
+npx --prefix $(dirname $LIB) tsx $LIB stop <session-id>
+
+# Check active sessions
+npx --prefix $(dirname $LIB) tsx $LIB status
+
+# Shutdown server completely (ALWAYS do this when done)
+npx --prefix $(dirname $LIB) tsx $LIB shutdown
 ```
 
 ## Action JSON Format
@@ -62,7 +74,7 @@ npx --prefix /path/to/lib tsx /path/to/lib/browser.ts stop <session-id>
 
 You are given:
 - Legacy URL and migrated URL
-- Specific page or flow to test (e.g., homepage, /about, checkout flow)
+- Specific page or flow to test
 
 Do:
 1. Start browser session
@@ -70,7 +82,8 @@ Do:
 3. Navigate and interact as instructed
 4. Compare screenshots and DOM at each step
 5. Report differences found
-6. **ALWAYS stop session** - even if errors occur, run `stop` command to cleanup
+6. **Stop the session** with `stop <session-id>`
+7. **ALWAYS shutdown server** - run `shutdown` to cleanup
 
 ## Comparison Focus
 
