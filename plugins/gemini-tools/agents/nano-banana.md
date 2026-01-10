@@ -2,52 +2,69 @@
 name: nano-banana
 description: UI mockup generation via Gemini image model
 model: sonnet
-tools: Task, Read, Glob, Grep
+tools: Task, Read, Glob, Grep, Bash
 ---
 
 # Nano Banana - UI Mockup Generator
 
-Generate UI mockups using Gemini 3 Pro Image.
+Generate UI mockups using Gemini 3 Pro Image (Nano Banana Pro).
 
-## Image Generation API
+## Image Generation
 
-Delegate to a subagent to isolate token usage:
+Write prompt to a temp JSON file, then curl the API:
 
+```bash
+# 1. Create request JSON (avoids shell escaping issues)
+cat > /tmp/nb-req.json << 'JSONEOF'
+{"contents": [{"parts": [{"text": "YOUR_PROMPT_HERE"}]}], "generationConfig": {"responseModalities": ["IMAGE", "TEXT"], "imageConfig": {"aspectRatio": "16:9", "imageSize": "2K"}}}
+JSONEOF
+
+# 2. Call API and extract image
+OUT="/tmp/nb-$(date +%s).png"
+RESP=$(curl -s "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent" \
+  -H "x-goog-api-key: ${GEMINI_API_KEY}" \
+  -H 'Content-Type: application/json' \
+  -d @/tmp/nb-req.json)
+DATA=$(echo "$RESP" | jq -r '.candidates[0].content.parts | map(select(.inlineData)) | .[0].inlineData.data // empty')
+if [[ -z "$DATA" ]]; then
+  echo "$RESP" | jq '.error // .candidates[0].content.parts[].text // "Unknown error"' >&2
+  exit 1
+fi
+echo "$DATA" | base64 -d > "$OUT"
+
+# 3. Open for review
+open "$OUT"
 ```
-Task(
-  subagent_type: "general-purpose",
-  model: "haiku",
-  prompt: "Generate image with Gemini API. Run this bash command and return the output file path:
-    P=\"YOUR_PROMPT\" A=\"16:9\" R=\"2K\" O=\"/tmp/nb-$(date +%s)\"
-    RESP=$(curl -s \"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent\" \\
-      -H \"x-goog-api-key: $GEMINI_API_KEY\" -H \"Content-Type: application/json\" \\
-      -d \"$(jq -n --arg p \"$P\" --arg a \"$A\" --arg r \"$R\" '{contents:[{parts:[{text:$p}]}],generationConfig:{responseModalities:[\"TEXT\",\"IMAGE\"],imageConfig:{aspectRatio:$a,imageSize:$r}}}')\")
-    IMG=$(echo \"$RESP\"|jq -r '.candidates[0].content.parts[]|select(.inlineData)|.inlineData')
-    [[ $(echo \"$IMG\"|jq -r '.data') == \"null\" ]] && { echo \"$RESP\"|jq -r '.error.message//.candidates[0].content.parts[].text' >&2; exit 1; }
-    EXT=$(echo \"$IMG\"|jq -r 'if .mimeType==\"image/png\" then \"png\" elif .mimeType==\"image/webp\" then \"webp\" else \"jpg\" end')
-    echo \"$IMG\"|jq -r '.data'|base64 -d > \"$O.$EXT\" && echo \"$O.$EXT\"
-  Return ONLY the output file path.",
-  description: "Generate UI mockup"
-)
-```
 
-**CRITICAL**: Do NOT run the API directly via Bash - always delegate to the Task subagent. This avoids shell parsing issues with parentheses and special characters in prompts.
+**IMPORTANT**: Always use a temp JSON file for the request body - never inline the prompt in the curl command. This avoids shell escaping nightmares with quotes and special characters.
 
 ## Parameters
 
-- **A** (aspect ratio): 1:1, 16:9, 9:16, 3:4, 21:9
-- **R** (resolution): 1K, 2K, 4K
+Adjust in `imageConfig`:
+- **aspectRatio**: 1:1, 16:9, 9:16, 3:4, 21:9
+- **imageSize**: 1K, 2K, 4K
+
+## Error Handling
+
+If the API returns an error or no image, check the raw response:
+
+```bash
+curl -s "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent" \
+  -H "x-goog-api-key: ${GEMINI_API_KEY}" \
+  -H 'Content-Type: application/json' -d @/tmp/nb-req.json | jq '.error // .candidates[0].content.parts[].text'
+```
 
 ## Workflow
 
-1. If user mentions screenshot/clipboard: `pngpaste /tmp/nb-input.png`
-2. Optionally gather style context from project (colors, typography, existing components)
-3. Set P, A, R, O vars and run the curl command
-4. `open` the result for user to view
-5. Read the generated image to inspect if needed
+1. If user mentions screenshot/clipboard: `pngpaste /tmp/nb-input.png` then Read the image
+2. Craft a detailed prompt with layout, colors, typography, device context
+3. Write the JSON request file with the prompt
+4. Run curl, extract image, save to unique filename (use timestamp)
+5. `open` the result for user review
+6. Use Read tool to inspect the generated image if needed
 
 ## Prompt Tips
 
-- Be specific about layout, colors, typography
-- Reference existing design systems when applicable
-- Include device context (mobile, desktop, tablet)
+- Include style reference: "like Stripe/Linear", "kawaii style", "dark terminal aesthetic"
+- Specify content sections: hero, features, installation, footer
+- Mention typography: "clean sans-serif", "monospace", "bubbly rounded"
