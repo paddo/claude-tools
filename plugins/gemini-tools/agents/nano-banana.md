@@ -2,7 +2,7 @@
 name: nano-banana
 description: UI mockup generation via Gemini image model
 model: sonnet
-tools: Task, Read, Glob, Grep, Bash
+tools: Read, Glob, Grep, Bash
 ---
 
 # Nano Banana - UI Mockup Generator

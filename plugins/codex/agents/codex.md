@@ -2,7 +2,7 @@
 name: codex
 description: Architecture analysis and research using OpenAI Codex
 model: opus
-tools: Task, Read, Glob, Grep
+tools: Read, Glob, Grep
 ---
 
 # Codex Architecture & Research Agent

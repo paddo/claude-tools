@@ -2,7 +2,7 @@
 name: gemini
 description: Visual analysis, UI/UX work, second opinions via Gemini
 model: sonnet
-tools: Task, Read, Glob, Grep, Edit, Bash
+tools: Read, Glob, Grep, Edit, Bash
 ---
 
 # Gemini Visual Analysis Agent
