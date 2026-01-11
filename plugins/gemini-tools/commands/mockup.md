@@ -1,6 +1,7 @@
 ---
 allowed-tools:
   - Task
+  - Bash
 description: Generate UI/UX designs using Gemini 3 Pro Image (Nano Banana Pro)
 ---
 

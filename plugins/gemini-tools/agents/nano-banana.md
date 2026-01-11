@@ -9,59 +9,36 @@ tools: Read, Glob, Grep, Bash
 
 Generate UI mockups using Gemini 3 Pro Image (Nano Banana Pro).
 
+## Setup
+
+Find the lib path once at the start:
+```bash
+find ~/.claude/plugins -name "nano-banana.ts" -path "*/gemini-tools/*" 2>/dev/null | head -1
+```
+
+Store as `LIB`. Check deps:
+```bash
+cd $(dirname $LIB) && ls node_modules 2>/dev/null || npm install
+```
+
 ## Image Generation
 
-Write prompt to a temp JSON file, then curl the API:
-
 ```bash
-# 1. Create request JSON (avoids shell escaping issues)
-cat > /tmp/nb-req.json << 'JSONEOF'
-{"contents": [{"parts": [{"text": "YOUR_PROMPT_HERE"}]}], "generationConfig": {"responseModalities": ["IMAGE", "TEXT"], "imageConfig": {"aspectRatio": "16:9", "imageSize": "2K"}}}
-JSONEOF
-
-# 2. Call API and extract image
-OUT="/tmp/nb-$(date +%s).png"
-RESP=$(curl -s "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent" \
-  -H "x-goog-api-key: ${GEMINI_API_KEY}" \
-  -H 'Content-Type: application/json' \
-  -d @/tmp/nb-req.json)
-DATA=$(echo "$RESP" | jq -r '.candidates[0].content.parts | map(select(.inlineData)) | .[0].inlineData.data // empty')
-if [[ -z "$DATA" ]]; then
-  echo "$RESP" | jq '.error // .candidates[0].content.parts[].text // "Unknown error"' >&2
-  exit 1
-fi
-echo "$DATA" | base64 -d > "$OUT"
-
-# 3. Open for review
-open "$OUT"
+npx --prefix $(dirname $LIB) tsx $LIB "YOUR PROMPT HERE" --aspect 16:9 --size 2K
 ```
 
-**IMPORTANT**: Always use a temp JSON file for the request body - never inline the prompt in the curl command. This avoids shell escaping nightmares with quotes and special characters.
+Options:
+- `--aspect`: 1:1, 16:9, 9:16, 3:4, 21:9
+- `--size`: 1K, 2K, 4K
 
-## Parameters
-
-Adjust in `imageConfig`:
-- **aspectRatio**: 1:1, 16:9, 9:16, 3:4, 21:9
-- **imageSize**: 1K, 2K, 4K
-
-## Error Handling
-
-If the API returns an error or no image, check the raw response:
-
-```bash
-curl -s "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent" \
-  -H "x-goog-api-key: ${GEMINI_API_KEY}" \
-  -H 'Content-Type: application/json' -d @/tmp/nb-req.json | jq '.error // .candidates[0].content.parts[].text'
-```
+The script outputs the image path and opens it automatically.
 
 ## Workflow
 
 1. If user mentions screenshot/clipboard: `pngpaste /tmp/nb-input.png` then Read the image
 2. Craft a detailed prompt with layout, colors, typography, device context
-3. Write the JSON request file with the prompt
-4. Run curl, extract image, save to unique filename (use timestamp)
-5. `open` the result for user review
-6. Use Read tool to inspect the generated image if needed
+3. Run the script with the prompt
+4. Use Read tool to inspect the generated image if needed
 
 ## Prompt Tips
 
