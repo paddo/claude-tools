@@ -3,6 +3,12 @@ name: miro
 description: Read and interpret Miro boards
 model: sonnet
 tools: Bash
+hooks:
+  PreToolUse:
+    - matcher: "mcp__.*"
+      hooks:
+        - type: command
+          command: "echo 'MCP tools not allowed' >&2 && exit 2"
 ---
 
 # Miro Board Reader

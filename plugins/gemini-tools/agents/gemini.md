@@ -3,6 +3,12 @@ name: gemini
 description: Visual analysis, UI/UX work, second opinions via Gemini
 model: sonnet
 tools: Read, Glob, Grep, Edit, Bash
+hooks:
+  PreToolUse:
+    - matcher: "mcp__.*"
+      hooks:
+        - type: command
+          command: "echo 'MCP tools not allowed' >&2 && exit 2"
 ---
 
 # Gemini Visual Analysis Agent

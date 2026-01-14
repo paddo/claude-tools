@@ -3,6 +3,12 @@ name: codex
 description: Architecture analysis and research using OpenAI Codex
 model: opus
 tools: Read, Glob, Grep
+hooks:
+  PreToolUse:
+    - matcher: "mcp__.*"
+      hooks:
+        - type: command
+          command: "echo 'MCP tools not allowed' >&2 && exit 2"
 ---
 
 # Codex Architecture & Research Agent

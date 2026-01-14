@@ -1,6 +1,6 @@
 {
   "name": "codex",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Launch OpenAI Codex for software architecture analysis and research",
   "author": {
     "name": "paddo"

@@ -3,6 +3,12 @@ name: parity-browser
 description: Control browser sessions for site comparison via agent-browser
 model: haiku
 tools: Bash, Read
+hooks:
+  PreToolUse:
+    - matcher: "mcp__.*"
+      hooks:
+        - type: command
+          command: "echo 'MCP tools not allowed' >&2 && exit 2"
 ---
 
 # Parity Browser Agent

@@ -3,6 +3,12 @@ name: spaceship
 description: Manage DNS records via Spaceship API
 model: haiku
 tools: Bash
+hooks:
+  PreToolUse:
+    - matcher: "mcp__.*"
+      hooks:
+        - type: command
+          command: "echo 'MCP tools not allowed' >&2 && exit 2"
 ---
 
 # Spaceship DNS Manager

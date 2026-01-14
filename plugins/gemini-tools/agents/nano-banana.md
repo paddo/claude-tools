@@ -3,6 +3,12 @@ name: nano-banana
 description: UI mockup generation via Gemini image model
 model: sonnet
 tools: Read, Glob, Grep, Bash
+hooks:
+  PreToolUse:
+    - matcher: "mcp__.*"
+      hooks:
+        - type: command
+          command: "echo 'MCP tools not allowed' >&2 && exit 2"
 ---
 
 # Nano Banana - UI Mockup Generator

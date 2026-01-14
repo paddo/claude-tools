@@ -1,6 +1,6 @@
 {
   "name": "dns",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Manage DNS records via provider APIs",
   "author": {
     "name": "paddo"

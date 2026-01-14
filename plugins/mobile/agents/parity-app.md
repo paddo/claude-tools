@@ -3,6 +3,12 @@ name: parity-app
 description: Control Appium sessions for cross-platform or migration comparison
 model: haiku
 tools: Bash, Read
+hooks:
+  PreToolUse:
+    - matcher: "mcp__.*"
+      hooks:
+        - type: command
+          command: "echo 'MCP tools not allowed' >&2 && exit 2"
 ---
 
 # Parity App Agent

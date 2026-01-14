@@ -3,6 +3,12 @@ name: test-app
 description: Control Appium session for native app E2E testing
 model: haiku
 tools: Bash, Read
+hooks:
+  PreToolUse:
+    - matcher: "mcp__.*"
+      hooks:
+        - type: command
+          command: "echo 'MCP tools not allowed' >&2 && exit 2"
 ---
 
 # Test App Agent
