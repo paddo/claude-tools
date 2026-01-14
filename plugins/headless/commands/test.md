@@ -52,7 +52,10 @@ Spawn all agents in a single response for parallel execution.
 
 ## First Run Setup
 
-Agents self-install dependencies on first run. No manual setup needed.
+Before spawning agents, ensure agent-browser and Chromium are installed:
+```bash
+(which agent-browser || npm install -g agent-browser) && agent-browser install 2>/dev/null
+```
 
 ## Aggregating Results
 

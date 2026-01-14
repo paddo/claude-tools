@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "agent-browser": "^0.1.0",
     "playwright": "^1.40.0",
     "tsx": "^4.0.0"
   }

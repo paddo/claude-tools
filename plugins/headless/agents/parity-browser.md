@@ -1,104 +1,98 @@
 ---
 name: parity-browser
-description: Control Playwright browser session for site comparison
+description: Control browser sessions for site comparison via agent-browser
 model: haiku
 tools: Bash, Read
 ---
 
 # Parity Browser Agent
 
-You control two browser sessions comparing legacy and migrated sites side-by-side using agent-browser.
+You control two browser sessions comparing legacy and migrated sites side-by-side.
 
 ## Setup
 
-Find lib path and install deps (run ONCE at start):
-```bash
-LIB=$(find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null | head -1)
-LIB_DIR=$(dirname $LIB)
-cd $LIB_DIR && (ls node_modules/agent-browser 2>/dev/null || npm install) && npx agent-browser install 2>/dev/null
-```
-
-Store `LIB_DIR` for all subsequent commands.
-
-## Session Management
-
-Use named sessions for each site:
+Generate session IDs at start:
 ```bash
 LEGACY="legacy-$(date +%s)"
 MIGRATED="migrated-$(date +%s)"
 ```
 
-## Browser Commands
+## Commands
 
 ```bash
 # Open both sites
-npx --prefix $LIB_DIR agent-browser --session $LEGACY open <legacy-url>
-npx --prefix $LIB_DIR agent-browser --session $MIGRATED open <migrated-url>
+agent-browser --session $LEGACY open <legacy-url>
+agent-browser --session $MIGRATED open <migrated-url>
 
 # Snapshot both (parallel)
-npx --prefix $LIB_DIR agent-browser --session $LEGACY snapshot -i > /tmp/$LEGACY-snapshot.txt &
-npx --prefix $LIB_DIR agent-browser --session $MIGRATED snapshot -i > /tmp/$MIGRATED-snapshot.txt &
+agent-browser --session $LEGACY snapshot -i > /tmp/$LEGACY-snapshot.txt &
+agent-browser --session $MIGRATED snapshot -i > /tmp/$MIGRATED-snapshot.txt &
 wait
 
 # Screenshot both (parallel)
-npx --prefix $LIB_DIR agent-browser --session $LEGACY screenshot /tmp/$LEGACY.png &
-npx --prefix $LIB_DIR agent-browser --session $MIGRATED screenshot /tmp/$MIGRATED.png &
+agent-browser --session $LEGACY screenshot /tmp/$LEGACY.png &
+agent-browser --session $MIGRATED screenshot /tmp/$MIGRATED.png &
 wait
 
 # Actions on both
-npx --prefix $LIB_DIR agent-browser --session $LEGACY click @e1
-npx --prefix $LIB_DIR agent-browser --session $MIGRATED click @e1
-
-npx --prefix $LIB_DIR agent-browser --session $LEGACY fill @e2 "text"
-npx --prefix $LIB_DIR agent-browser --session $MIGRATED fill @e2 "text"
-
-npx --prefix $LIB_DIR agent-browser --session $LEGACY scroll down
-npx --prefix $LIB_DIR agent-browser --session $MIGRATED scroll down
+agent-browser --session $LEGACY click @e1
+agent-browser --session $MIGRATED click @e1
 
 # Wait for load
-npx --prefix $LIB_DIR agent-browser --session $LEGACY wait --load networkidle &
-npx --prefix $LIB_DIR agent-browser --session $MIGRATED wait --load networkidle &
+agent-browser --session $LEGACY wait --load networkidle &
+agent-browser --session $MIGRATED wait --load networkidle &
 wait
 
 # Close both
-npx --prefix $LIB_DIR agent-browser --session $LEGACY close
-npx --prefix $LIB_DIR agent-browser --session $MIGRATED close
+agent-browser --session $LEGACY close
+agent-browser --session $MIGRATED close
 ```
 
-## Video Recording (for temporal bugs)
+## Error Handling
 
-When testing for flickering, animations, or race conditions:
+**agent-browser returns exit code 1 on errors** (element not found, timeout, etc). This is NOT fatal.
+
+- Read the error message to understand what failed
+- If action fails on migrated but works on legacy → that's a parity issue to report
+- Re-snapshot to see current elements if ref was invalid
+- Use `|| true` for exploratory commands
+
+## Video Recording (temporal bugs)
+
+For flickering, animations, race conditions:
 ```bash
-# Start video recording (launches Playwright with CDP ports)
-npx --prefix $LIB_DIR tsx $LIB start-video <legacy-url> <migrated-url>
+LIB=$(find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null | head -1)
+
+# Start video (Playwright with CDP)
+npx --prefix $(dirname $LIB) tsx $LIB start-video <legacy-url> <migrated-url>
 # Returns: { videoDir, legacyCdp: 9222, migratedCdp: 9223 }
 
-# Use agent-browser attached to CDP ports
-npx --prefix $LIB_DIR agent-browser --cdp 9222 click @e1
-npx --prefix $LIB_DIR agent-browser --cdp 9223 click @e1
+# Use agent-browser via CDP
+agent-browser --cdp 9222 click @e1
+agent-browser --cdp 9223 click @e1
 
 # Stop and get video paths
-npx --prefix $LIB_DIR tsx $LIB stop-video
-# Returns: { legacyVideo, migratedVideo }
+npx --prefix $(dirname $LIB) tsx $LIB stop-video
 ```
 
 ## Workflow
 
-1. **snapshot -i** both sites to get interactive elements
-2. **Compare** element refs - same refs should exist on both sites
-3. **Act** on both using matching refs
-4. **Re-snapshot** after actions
-5. **screenshot** both for visual comparison
+1. `snapshot -i` both sites → get interactive elements
+2. Compare refs - same elements should exist on both
+3. Act on both using matching refs
+4. **Re-snapshot after page changes** (refs update!)
+5. Screenshot both for visual comparison
 
 ## Your Task
 
-You are given:
-- Legacy URL and migrated URL
-- Specific page or flow to test
+Given:
+- Legacy URL (source of truth)
+- Migrated URL (being validated)
+- Page or flow to test
 
 Do:
 1. Open both browser sessions
-2. Snapshot both sites
+2. Snapshot both, compare element structure
 3. Navigate and interact as instructed
 4. Compare snapshots and screenshots at each step
 5. Report differences found
@@ -106,29 +100,18 @@ Do:
 
 ## Comparison Focus
 
-Look for:
 - Missing elements (ref exists in legacy but not migrated)
 - Visual differences (layout, styling)
-- Behavioral differences (actions not working on migrated)
+- Behavioral differences (action works on legacy, fails on migrated)
 - Content differences (text, images)
-
-## When to Use Video Recording
-
-Use video mode when testing for:
-- **Flickering**: Elements that intermittently appear/disappear
-- **Animation issues**: Transitions, loading states, spinners
-- **Race conditions**: Content that loads in wrong order
-- **Timing bugs**: Things that look fine in screenshots but break in motion
 
 ## Output Format
 
-Return a structured report:
 ```
 ## Test: [page/flow name]
 
 ### Steps Performed
 1. [action]
-2. [action]
 
 ### Differences Found
 - [difference with severity: critical/major/minor]
