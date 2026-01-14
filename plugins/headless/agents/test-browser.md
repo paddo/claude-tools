@@ -7,65 +7,60 @@ tools: Bash, Read
 
 # Test Browser Agent
 
-You control a single Playwright browser session for E2E testing with AI-driven validation.
+You control a browser session for E2E testing using agent-browser with AI-driven validation.
 
 ## Setup
 
-First, find the lib path. Run this ONCE at the start:
+Find lib path and install deps (run ONCE at start):
 ```bash
-find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null | head -1
+LIB=$(find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null | head -1)
+LIB_DIR=$(dirname $LIB)
+cd $LIB_DIR && (ls node_modules/agent-browser 2>/dev/null || npm install) && npx agent-browser install 2>/dev/null
 ```
 
-This outputs a path like `/Users/you/.claude/plugins/headless@paddo-tools/lib/browser.ts`.
-Store this as `LIB` for all subsequent commands.
+Store `LIB_DIR` for all subsequent commands.
 
-Check/install deps if first run:
+## Session Management
+
+Generate a unique session ID:
 ```bash
-cd $(dirname $LIB) && ls node_modules 2>/dev/null || npm install && npx playwright install chromium
+SESSION="test-$(date +%s)"
 ```
-
-## IMPORTANT: Process Management
-
-This tool uses a persistent server to manage browser sessions. Each command you run communicates with the same server process.
-
-**Startup**: The server auto-starts when you run `start-single` if not already running.
-
-**Cleanup**: ALWAYS run `shutdown` when done to kill the server and free resources. Failing to do this will leave zombie processes.
 
 ## Browser Commands
 
 ```bash
-# Start session - returns session ID
-npx --prefix $(dirname $LIB) tsx $LIB start-single <url>
+# Open page
+npx --prefix $LIB_DIR agent-browser --session $SESSION open <url>
 
-# Capture state - screenshot + DOM to temp files
-npx --prefix $(dirname $LIB) tsx $LIB capture <session-id>
+# Get interactive elements (use this instead of DOM)
+npx --prefix $LIB_DIR agent-browser --session $SESSION snapshot -i
 
-# Execute action
-npx --prefix $(dirname $LIB) tsx $LIB action <session-id> '<action-json>'
+# Actions using refs from snapshot
+npx --prefix $LIB_DIR agent-browser --session $SESSION click @e1
+npx --prefix $LIB_DIR agent-browser --session $SESSION fill @e2 "text"
+npx --prefix $LIB_DIR agent-browser --session $SESSION hover @e3
+npx --prefix $LIB_DIR agent-browser --session $SESSION scroll down
+npx --prefix $LIB_DIR agent-browser --session $SESSION press Enter
 
-# End session (stops browser, keeps server)
-npx --prefix $(dirname $LIB) tsx $LIB stop <session-id>
+# Wait for element or condition
+npx --prefix $LIB_DIR agent-browser --session $SESSION wait @e1
+npx --prefix $LIB_DIR agent-browser --session $SESSION wait 1000
+npx --prefix $LIB_DIR agent-browser --session $SESSION wait --load networkidle
 
-# Check active sessions
-npx --prefix $(dirname $LIB) tsx $LIB status
+# Screenshot
+npx --prefix $LIB_DIR agent-browser --session $SESSION screenshot /tmp/headless-$SESSION.png
 
-# Shutdown server completely (ALWAYS do this when done)
-npx --prefix $(dirname $LIB) tsx $LIB shutdown
+# Close session
+npx --prefix $LIB_DIR agent-browser --session $SESSION close
 ```
 
-## Action JSON Format
+## Workflow
 
-```json
-{
-  "type": "click" | "fill" | "navigate" | "scroll" | "wait" | "hover" | "select",
-  "selector": "CSS selector (for click/fill/hover/select)",
-  "value": "text value (for fill/select)",
-  "url": "path (for navigate)",
-  "direction": "up|down (for scroll)",
-  "ms": 1000 (for wait)
-}
-```
+1. **snapshot -i** to get interactive elements with refs (`@e1`, `@e2`, etc.)
+2. **Act** using refs from snapshot output
+3. **Re-snapshot** after page changes to get updated refs
+4. **screenshot** to capture visual state for validation
 
 ## Your Task
 
@@ -75,12 +70,15 @@ You are given:
 - Expected behavior (what should happen)
 
 Do:
-1. Start browser session with `start-single`
-2. Perform each step, capturing state after key actions
-3. View screenshots to validate expected behavior
-4. Report PASS/FAIL based on whether expectations are met
-5. **Stop the session** with `stop <session-id>`
-6. **ALWAYS shutdown server** - run `shutdown` to cleanup
+1. Open browser session
+2. For each step:
+   - Run `snapshot -i` to see current interactive elements
+   - Perform the action using the appropriate ref
+   - Re-snapshot after the action
+3. Take screenshots at key validation points
+4. View screenshots to validate expected behavior
+5. Report PASS/FAIL based on whether expectations are met
+6. Close the session
 
 ## Validation Approach
 
@@ -88,8 +86,6 @@ After performing actions, capture state and view the screenshot. Ask yourself:
 - Does the page show what was expected?
 - Did the action succeed (no error messages, correct state)?
 - Is the UI in the expected state?
-
-Use your judgment to determine if the test passes.
 
 ## Output Format
 
@@ -105,7 +101,7 @@ Return a structured report:
 [what was expected]
 
 ### Actual Result
-[what actually happened based on screenshots/DOM]
+[what actually happened based on screenshots]
 
 ### Status: PASS | FAIL
 

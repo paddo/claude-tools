@@ -51,20 +51,7 @@ Spawn all agents in a single response for parallel execution.
 
 ## First Run Setup
 
-Before spawning agents, find the lib path:
-```bash
-find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null
-```
-
-Check if deps are installed (use dirname of path above):
-```bash
-ls /path/to/lib/node_modules 2>/dev/null || echo "DEPS_NEEDED"
-```
-
-If DEPS_NEEDED, run setup first:
-```bash
-cd /path/to/lib && npm install && npx playwright install chromium
-```
+Agents self-install dependencies on first run. No manual setup needed.
 
 ## Aggregating Results
 
