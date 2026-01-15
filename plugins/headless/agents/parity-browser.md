@@ -5,13 +5,21 @@ model: haiku
 tools: Bash, Read
 hooks:
   PreToolUse:
-    - matcher: "mcp__.*"
+    - matcher: Bash
       hooks:
         - type: command
-          command: "echo 'MCP tools not allowed' >&2 && exit 2"
+          command: |
+            CMD=$(echo "$TOOL_INPUT" | jq -r '.command // empty')
+            if echo "$CMD" | grep -qE '^(agent-browser|SESSION=|LEGACY=|MIGRATED=|LIB=\$\(find|npx --prefix|wait$)'; then
+              exit 0
+            fi
+            echo "Only agent-browser/video commands allowed" >&2
+            exit 2
 ---
 
 # Parity Browser Agent
+
+**CRITICAL: You may ONLY use `agent-browser` commands (and video recording commands shown below). Do NOT use mcp-cli, curl, wget, or any other tools.**
 
 You control two browser sessions comparing legacy and migrated sites side-by-side.
 
