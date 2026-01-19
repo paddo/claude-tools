@@ -1,6 +1,6 @@
 {
   "name": "headless",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Headless browser automation for site comparison and E2E testing",
   "author": {
     "name": "paddo"
