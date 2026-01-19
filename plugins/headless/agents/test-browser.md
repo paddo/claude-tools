@@ -10,7 +10,7 @@ hooks:
         - type: command
           command: |
             CMD=$(echo "$TOOL_INPUT" | jq -r '.command // empty')
-            if echo "$CMD" | grep -qE '^(agent-browser|SESSION=|LIB=\$\(find|npx --prefix|wait$)'; then
+            if echo "$CMD" | grep -qE '^(agent-browser|SESSION=|wait$)'; then
               exit 0
             fi
             echo "Only agent-browser/video commands allowed" >&2

@@ -1,9 +1,0 @@
-{
-  "name": "headless-lib",
-  "private": true,
-  "type": "module",
-  "dependencies": {
-    "playwright": "^1.40.0",
-    "tsx": "^4.0.0"
-  }
-}

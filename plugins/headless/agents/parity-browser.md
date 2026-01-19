@@ -10,7 +10,7 @@ hooks:
         - type: command
           command: |
             CMD=$(echo "$TOOL_INPUT" | jq -r '.command // empty')
-            if echo "$CMD" | grep -qE '^(agent-browser|SESSION=|LEGACY=|MIGRATED=|LIB=\$\(find|npx --prefix|wait$)'; then
+            if echo "$CMD" | grep -qE '^(agent-browser|SESSION=|LEGACY=|MIGRATED=|wait$)'; then
               exit 0
             fi
             echo "Only agent-browser/video commands allowed" >&2
@@ -75,18 +75,19 @@ agent-browser --session $MIGRATED close
 
 For flickering, animations, race conditions:
 ```bash
-LIB=$(find ~/.claude/plugins -name "browser.ts" -path "*/headless/*" 2>/dev/null | head -1)
+# Start video on both sessions
+agent-browser --session $LEGACY record start /tmp/$LEGACY.webm &
+agent-browser --session $MIGRATED record start /tmp/$MIGRATED.webm &
+wait
 
-# Start video (Playwright with CDP)
-npx --prefix $(dirname $LIB) tsx $LIB start-video <legacy-url> <migrated-url>
-# Returns: { videoDir, legacyCdp: 9222, migratedCdp: 9223 }
+# Perform actions...
+agent-browser --session $LEGACY click @e1
+agent-browser --session $MIGRATED click @e1
 
-# Use agent-browser via CDP
-agent-browser --cdp 9222 click @e1
-agent-browser --cdp 9223 click @e1
-
-# Stop and get video paths
-npx --prefix $(dirname $LIB) tsx $LIB stop-video
+# Stop recording
+agent-browser --session $LEGACY record stop &
+agent-browser --session $MIGRATED record stop &
+wait
 ```
 
 ## Workflow
