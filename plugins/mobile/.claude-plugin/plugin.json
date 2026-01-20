@@ -1,7 +1,7 @@
 {
   "name": "mobile",
-  "version": "0.2.1",
-  "description": "Native mobile app testing - E2E and cross-platform parity",
+  "version": "1.0.0",
+  "description": "Mobile testing with Maestro: file watch, dev loop, parity testing, JSON logs",
   "author": {
     "name": "paddo"
   }

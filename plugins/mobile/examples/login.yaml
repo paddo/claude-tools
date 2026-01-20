@@ -1,0 +1,24 @@
+# Example Maestro flow for login testing
+# Copy to your project's flows/ directory and customize
+
+appId: com.example.app  # Your bundle ID (iOS) or package (Android)
+---
+- launchApp
+
+- tapOn: "Email"
+- inputText: "test@example.com"
+
+- tapOn: "Password"
+- inputText: "password123"
+
+- tapOn: "Login"
+
+# Wait for navigation
+- waitForAnimationToEnd
+
+# Verify success
+- assertVisible: "Welcome"
+
+# Or check for specific element
+- assertVisible:
+    id: "home_screen"
