@@ -25,10 +25,7 @@ find ~/.claude/plugins -name "driver.ts" -path "*/mobile/*" 2>/dev/null
 This outputs a path like `/Users/you/.claude/plugins/mobile@paddo-tools/lib/driver.ts`.
 Use its directory as MOBILE_LIB for all commands.
 
-Check/install deps if first run:
-```bash
-cd /path/to/lib && ls node_modules 2>/dev/null || npm install
-```
+Dependencies auto-install on first run.
 
 ## Driver Commands
 

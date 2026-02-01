@@ -142,7 +142,15 @@ async function ensureAppium(port: number): Promise<void> {
   const appiumBin = path.join(libDir, "node_modules", ".bin", "appium");
 
   if (!fs.existsSync(appiumBin)) {
-    throw new Error(`Appium not found. Run: npm install --prefix ${libDir}`);
+    // Auto-install dependencies on first run
+    console.error(JSON.stringify({ status: "installing", message: "Installing Appium dependencies (first run)..." }));
+    const npmResult = spawn("npm", ["install", "--prefix", libDir], { stdio: "inherit" });
+    await new Promise<void>((resolve, reject) => {
+      npmResult.on("close", (code) => code === 0 ? resolve() : reject(new Error(`npm install failed with code ${code}`)));
+    });
+    if (!fs.existsSync(appiumBin)) {
+      throw new Error(`Appium install failed. Try manually: npm install --prefix ${libDir}`);
+    }
   }
 
   const child = spawn(appiumBin, ["--port", String(port), "--relaxed-security"], {

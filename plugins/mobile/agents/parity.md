@@ -26,10 +26,7 @@ Find the lib path (run ONCE at start):
 find ~/.claude/plugins -name "driver.ts" -path "*/mobile/*" 2>/dev/null
 ```
 
-Check/install deps if first run:
-```bash
-cd /path/to/lib && ls node_modules 2>/dev/null || npm install
-```
+Dependencies auto-install on first run.
 
 ## Driver Commands
 

@@ -11,10 +11,7 @@ AI-driven mobile testing with Appium. Claude can see screenshots, read UI hierar
 
 ## Setup
 
-Install Appium dependencies (first run):
-```bash
-cd ~/.claude/plugins/mobile*/lib && npm install
-```
+Dependencies auto-install on first run. No manual setup required.
 
 ## How It Works
 
