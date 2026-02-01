@@ -1,6 +1,6 @@
 {
   "name": "mobile",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "AI-driven mobile testing with Appium: single app, cross-platform parity, migration comparison",
   "author": {
     "name": "paddo"
