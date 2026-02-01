@@ -28,6 +28,23 @@ find ~/.claude/plugins -name "driver.ts" -path "*/mobile/*" 2>/dev/null
 
 Dependencies auto-install on first run.
 
+## Pre-flight Check
+
+Before starting a session, verify environment:
+```bash
+npx --prefix /path/to/lib tsx /path/to/lib/driver.ts status
+```
+
+Returns: `{ "appium": true/false, "port": 4723, "devices": { "ios": [...], "android": [...] } }`
+
+- If `devices.ios` is empty, no simulator is booted
+- If `devices.android` is empty, no Android device/emulator connected
+- Parity mode requires TWO devices (or one iOS + one Android for cross-platform)
+
+## Solo Audit Mode
+
+If only ONE device is available, this agent is NOT appropriate. Use `mobile:test` agent instead for single-device audits without comparison.
+
 ## Driver Commands
 
 ```bash

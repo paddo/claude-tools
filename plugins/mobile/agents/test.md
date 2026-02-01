@@ -27,6 +27,20 @@ Use its directory as MOBILE_LIB for all commands.
 
 Dependencies auto-install on first run.
 
+## Pre-flight Check
+
+Before starting a session, verify environment:
+```bash
+npx --prefix /path/to/lib tsx /path/to/lib/driver.ts status
+```
+
+Returns: `{ "appium": true/false, "port": 4723, "devices": { "ios": [...], "android": [...] } }`
+
+If no devices listed, boot a simulator first:
+```bash
+xcrun simctl boot "iPhone 16 Pro"  # iOS
+```
+
 ## Driver Commands
 
 Replace `/path/to/lib` with actual path:

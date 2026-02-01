@@ -24,7 +24,11 @@ The user will provide:
 
 ## Execution Strategy
 
-For each flow, spawn a **mobile:parity** agent. For multiple flows, spawn multiple agents in parallel.
+**IMPORTANT:** Only ONE agent per simulator/device. Do NOT spawn parallel agents - they will fight over the same Appium session.
+
+- **Single device available:** Use `mobile:test` agent for solo audit (no comparison)
+- **Two devices available:** Use `mobile:parity` agent with both device UDIDs specified
+- **Multiple flows:** Execute sequentially within a single agent, NOT parallel agents
 
 Use the Task tool with subagent_type `mobile:parity` and prompts like:
 
@@ -57,8 +61,6 @@ Flow:
 
 Compare: New version should behave identically to old
 ```
-
-Spawn all agents in a single response for parallel execution.
 
 ## First Run Setup
 

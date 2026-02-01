@@ -72,6 +72,14 @@ function saveSession(sessionId: string, data: SessionFile): void {
 function loadSession(sessionId: string): SessionFile | null {
   const file = path.join(SESSION_DIR, `${sessionId}.json`);
   if (!fs.existsSync(file)) return null;
+
+  // Check if session file is stale (>30 min old)
+  const stats = fs.statSync(file);
+  if (Date.now() - stats.mtimeMs > 30 * 60 * 1000) {
+    fs.unlinkSync(file);
+    return null;
+  }
+
   return JSON.parse(fs.readFileSync(file, "utf-8"));
 }
 
@@ -134,6 +142,35 @@ async function isAppiumRunning(port: number): Promise<boolean> {
   });
 }
 
+async function getConnectedDevices(): Promise<{ ios: string[]; android: string[] }> {
+  const { execSync } = await import("child_process");
+  const ios: string[] = [];
+  const android: string[] = [];
+
+  try {
+    const simOutput = execSync("xcrun simctl list devices booted -j", { encoding: "utf-8" });
+    const simData = JSON.parse(simOutput);
+    for (const runtime of Object.values(simData.devices) as Array<Array<{ name: string; udid: string; state: string }>>) {
+      for (const device of runtime) {
+        if (device.state === "Booted") {
+          ios.push(`${device.name} (${device.udid})`);
+        }
+      }
+    }
+  } catch {}
+
+  try {
+    const adbOutput = execSync("adb devices", { encoding: "utf-8" });
+    const lines = adbOutput.split("\n").slice(1);
+    for (const line of lines) {
+      const match = line.match(/^(\S+)\s+device$/);
+      if (match) android.push(match[1]);
+    }
+  } catch {}
+
+  return { ios, android };
+}
+
 async function ensureAppium(port: number): Promise<void> {
   if (await isAppiumRunning(port)) return;
 
@@ -183,7 +220,7 @@ function parseArgs(args: string[]): Record<string, string> {
   return result;
 }
 
-async function createDriver(platform: Platform, appId: string, opts: Record<string, string> = {}): Promise<Browser> {
+async function createDriver(platform: Platform, appId: string, opts: Record<string, string> = {}, retries = 3): Promise<Browser> {
   const port = parseInt(opts.port || String(appiumPort), 10);
   await ensureAppium(port);
 
@@ -234,15 +271,25 @@ async function createDriver(platform: Platform, appId: string, opts: Record<stri
     if (capabilities[key] === undefined) delete capabilities[key];
   });
 
-  const driver = await remote({
-    hostname: opts.host || "127.0.0.1",
-    port,
-    path: "/",
-    capabilities,
-    logLevel: "silent",
-  });
+  // Retry loop for transient startup failures
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const driver = await remote({
+        hostname: opts.host || "127.0.0.1",
+        port,
+        path: "/",
+        capabilities,
+        logLevel: "silent",
+      });
+      return driver;
+    } catch (err) {
+      if (attempt === retries) throw err;
+      console.error(JSON.stringify({ status: "retry", attempt, maxRetries: retries, error: String(err) }));
+      await new Promise(r => setTimeout(r, 2000 * attempt)); // exponential backoff
+    }
+  }
 
-  return driver;
+  throw new Error("unreachable");
 }
 
 // Single app testing
@@ -631,8 +678,16 @@ async function main() {
         await stop(positional[0]);
         break;
 
+      case "status": {
+        const port = parseInt(opts.port || String(appiumPort), 10);
+        const appiumRunning = await isAppiumRunning(port);
+        const devices = await getConnectedDevices();
+        console.log(JSON.stringify({ appium: appiumRunning, port, devices }));
+        break;
+      }
+
       default:
-        console.error("Commands: start-ios, start-android, start-parity-migration, start-parity-cross, capture, action, stop");
+        console.error("Commands: start-ios, start-android, start-parity-migration, start-parity-cross, capture, action, stop, status");
         process.exit(1);
     }
   } catch (err) {
