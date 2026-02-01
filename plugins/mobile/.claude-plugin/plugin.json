@@ -1,7 +1,7 @@
 {
   "name": "mobile",
-  "version": "1.0.0",
-  "description": "Mobile testing with Maestro: file watch, dev loop, parity testing, JSON logs",
+  "version": "2.0.0",
+  "description": "AI-driven mobile testing with Appium: single app, cross-platform parity, migration comparison",
   "author": {
     "name": "paddo"
   }

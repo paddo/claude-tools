@@ -1,81 +1,60 @@
 # mobile
 
-Mobile testing with Maestro: file watching, dev loop, parity testing, JSON logs.
+AI-driven mobile testing with Appium. Claude can see screenshots, read UI hierarchy, and interact with apps.
 
-## Quick Start
+## Agents
 
+| Agent | Description |
+|-------|-------------|
+| `mobile:test` | Single app E2E testing - Claude drives the app interactively |
+| `mobile:parity` | Compare iOS vs Android, or old vs new versions side-by-side |
+
+## Setup
+
+Install Appium dependencies (first run):
 ```bash
-# Install deps
-/mobile:dev install
-
-# Run single test
-/mobile:dev test ./flows/smoke.yaml
-
-# Continuous mode (watches flow files)
-/mobile:dev continuous ./flows
-
-# Full dev loop (watch source → rebuild → test)
-/mobile:dev dev ios com.example.app ./src ./flows/smoke.yaml "xcodebuild -scheme App"
-
-# Parity test (two devices)
-/mobile:dev parity ./flows/smoke.yaml <device1-udid> <device2-udid> primary secondary
+cd ~/.claude/plugins/mobile*/lib && npm install
 ```
 
-## Commands
+## How It Works
 
-| Command | Description |
-|---------|-------------|
-| `install` | Install Maestro + fswatch |
-| `test <flow>` | Run single test |
-| `continuous <dir>` | Watch flow files, re-run on change |
-| `dev <plat> <app> <src> <flow> [cmd]` | Full dev loop with file watching |
-| `parity <flow> <dev1> <dev2> [l1] [l2]` | Run flow on two devices, compare |
-| `devices` | List available iOS/Android devices |
-| `logs [n] [type]` | Show recent logs |
-| `running` | Check if dev loop is running |
-| `stop-dev` | Stop the dev loop |
+1. **Start session** - Connects to simulator or device
+2. **Capture state** - Screenshot + UI hierarchy XML
+3. **Claude views screenshot** - Sees what's on screen
+4. **Claude reads hierarchy** - Finds element selectors
+5. **Execute action** - Tap, fill, swipe, etc.
+6. **Repeat** - AI-driven exploration
 
-## Features
+## Actions
 
-- **File watching**: fswatch (macOS) / inotifywait (Linux)
-- **Auto-rebuild**: Triggers build command on source changes
-- **Maestro testing**: Fast, reliable, built-in waits
-- **Parity testing**: Compare iOS vs Android, or old vs new versions
-- **JSON logs**: Device logs streamed for Claude Code visibility
-- **Physical devices**: Works with real devices, not just simulators
-
-## Log Files
-
-All in `/tmp/maestro-dev/`:
-
-| File | Content |
-|------|---------|
-| `device.log` | Device/simulator logs (JSON) |
-| `runner.log` | Dev loop events (JSON) |
-| `build.log` | Build command output |
-| `test-result.log` | Last test result |
-
-## Maestro Flow Example
-
-```yaml
-# flows/login.yaml
-appId: com.example.app
----
-- launchApp
-- tapOn: "Email"
-- inputText: "test@example.com"
-- tapOn: "Password"
-- inputText: "password123"
-- tapOn: "Login"
-- assertVisible: "Welcome"
-- takeScreenshot: /tmp/maestro-dev/login-success.png
+```json
+{
+  "type": "tap | fill | swipe | scroll | back | launch | longPress | wait",
+  "selector": "~accessibilityId or //xpath",
+  "value": "text for fill",
+  "direction": "up | down | left | right",
+  "ms": 1000
+}
 ```
+
+## Selectors
+
+Prefer accessibility IDs (prefix with `~`):
+- iOS: `~loginButton` → `accessibilityIdentifier`
+- Android: `~loginButton` → `content-desc`
+- SwiftUI: `.accessibilityIdentifier("loginButton")`
+- Compose: `Modifier.testTag("loginButton")`
+
+Fallback to XPath:
+- iOS: `//XCUIElementTypeButton[@name="Login"]`
+- Android: `//android.widget.Button[@text="Login"]`
 
 ## Requirements
 
-- **iOS**: Xcode CLI tools, Simulator or device
-- **Android**: ADB, Emulator or device
-- **macOS**: Homebrew (for fswatch)
-- **Linux**: apt/yum (for inotify-tools)
+- **iOS**: Xcode CLI tools, Simulator or physical device
+- **Android**: ADB, Emulator or physical device
+- **Node.js**: For Appium server
 
-Dependencies auto-install on first run.
+## Session Files
+
+Sessions persist in `/tmp/mobile-sessions/` for reconnection across CLI calls.
