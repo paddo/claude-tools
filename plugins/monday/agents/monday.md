@@ -232,14 +232,17 @@ curl -s "https://api.monday.com/v2" \
 
 Files are uploaded via multipart form-data to `https://api.monday.com/v2/file`.
 
+**IMPORTANT:** The multipart structure requires a `map` field to link the file to the GraphQL variable.
+
 ### Upload File to Update
 Attach a file (screenshot, image, document) to an existing update:
 
 ```bash
 curl -X POST "https://api.monday.com/v2/file" \
   -H "Authorization: $MONDAY_API_TOKEN" \
-  -F 'query=mutation ($file: File!) { add_file_to_update(file: $file, update_id: UPDATE_ID) { id } }' \
-  -F 'variables[file]=@/path/to/screenshot.png'
+  -F 'query="mutation add_file($file: File!) { add_file_to_update(update_id: UPDATE_ID, file: $file) { id } }"' \
+  -F 'map="{\"image\":\"variables.file\"}"' \
+  -F 'image=@/path/to/screenshot.png'
 ```
 
 ### Workflow: Add Comment with Screenshot
@@ -251,12 +254,13 @@ curl -s "https://api.monday.com/v2" \
   -d '{"query": "mutation { create_update(item_id: ITEM_ID, body: \"Screenshot attached below:\") { id } }"}'
 ```
 
-2. Then upload the file to that update:
+2. Then upload the file to that update (note the `map` field):
 ```bash
 curl -X POST "https://api.monday.com/v2/file" \
   -H "Authorization: $MONDAY_API_TOKEN" \
-  -F 'query=mutation ($file: File!) { add_file_to_update(file: $file, update_id: UPDATE_ID) { id } }' \
-  -F 'variables[file]=@/path/to/screenshot.png'
+  -F 'query="mutation add_file($file: File!) { add_file_to_update(update_id: UPDATE_ID, file: $file) { id } }"' \
+  -F 'map="{\"image\":\"variables.file\"}"' \
+  -F 'image=@/path/to/screenshot.png'
 ```
 
 ### Upload File to File Column
@@ -265,8 +269,9 @@ Attach a file directly to an item's file column:
 ```bash
 curl -X POST "https://api.monday.com/v2/file" \
   -H "Authorization: $MONDAY_API_TOKEN" \
-  -F 'query=mutation ($file: File!) { add_file_to_column(file: $file, item_id: ITEM_ID, column_id: "files") { id } }' \
-  -F 'variables[file]=@/path/to/document.pdf'
+  -F 'query="mutation add_file($file: File!) { add_file_to_column(file: $file, item_id: ITEM_ID, column_id: \"files\") { id } }"' \
+  -F 'map="{\"image\":\"variables.file\"}"' \
+  -F 'image=@/path/to/document.pdf'
 ```
 
 ### Supported File Types
