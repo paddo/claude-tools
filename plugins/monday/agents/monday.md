@@ -277,6 +277,51 @@ curl -X POST "https://api.monday.com/v2/file" \
 ### Supported File Types
 JPEG, PNG, GIF, PDF, Word/Doc, XLSX, CSV, SVG, TXT, MP4, AI (max 500 MB)
 
+### Working Python Example (Recommended)
+The curl approach often fails with "Unsupported query". Use Python with urllib instead:
+
+```python
+import urllib.request
+import os
+import uuid
+
+api_key = os.environ.get('MONDAY_API_TOKEN')
+update_id = YOUR_UPDATE_ID
+file_path = '/path/to/image.png'
+
+url = "https://api.monday.com/v2/file"
+
+query = f'''mutation add_file($file: File!) {{
+    add_file_to_update(update_id: {update_id}, file: $file) {{
+        id
+    }}
+}}'''
+
+boundary = str(uuid.uuid4())
+
+with open(file_path, 'rb') as f:
+    file_data = f.read()
+
+body = b''
+body += f'--{boundary}\r\n'.encode()
+body += f'Content-Disposition: form-data; name="query"\r\n\r\n'.encode()
+body += f'{query}\r\n'.encode()
+body += f'--{boundary}\r\n'.encode()
+body += f'Content-Disposition: form-data; name="variables[file]"; filename="{os.path.basename(file_path)}"\r\n'.encode()
+body += f'Content-Type: image/png\r\n\r\n'.encode()
+body += file_data
+body += f'\r\n--{boundary}--\r\n'.encode()
+
+headers = {
+    'Authorization': api_key,
+    'Content-Type': f'multipart/form-data; boundary={boundary}'
+}
+
+req = urllib.request.Request(url, data=body, headers=headers, method='POST')
+with urllib.request.urlopen(req) as response:
+    print(response.read().decode())
+```
+
 ## Error Handling
 
 - **401/403**: Invalid or missing token - check $MONDAY_API_TOKEN
