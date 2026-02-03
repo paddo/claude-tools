@@ -210,6 +210,68 @@ Multiple people (full format):
 | 333 | Setup CI | Done | Jane |
 ```
 
+## Updates (Comments)
+
+### Add Update/Comment to Item
+```bash
+curl -s "https://api.monday.com/v2" \
+  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "mutation { create_update(item_id: ITEM_ID, body: \"Your comment text here\") { id } }"}'
+```
+
+### Get Updates for Item
+```bash
+curl -s "https://api.monday.com/v2" \
+  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "{ items(ids: [ITEM_ID]) { updates(limit: 10) { id body created_at creator { name } } } }"}'
+```
+
+## File Upload (Screenshots/Attachments)
+
+Files are uploaded via multipart form-data to `https://api.monday.com/v2/file`.
+
+### Upload File to Update
+Attach a file (screenshot, image, document) to an existing update:
+
+```bash
+curl -X POST "https://api.monday.com/v2/file" \
+  -H "Authorization: $MONDAY_API_TOKEN" \
+  -F 'query=mutation ($file: File!) { add_file_to_update(file: $file, update_id: UPDATE_ID) { id } }' \
+  -F 'variables[file]=@/path/to/screenshot.png'
+```
+
+### Workflow: Add Comment with Screenshot
+1. First create an update to get its ID:
+```bash
+curl -s "https://api.monday.com/v2" \
+  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "mutation { create_update(item_id: ITEM_ID, body: \"Screenshot attached below:\") { id } }"}'
+```
+
+2. Then upload the file to that update:
+```bash
+curl -X POST "https://api.monday.com/v2/file" \
+  -H "Authorization: $MONDAY_API_TOKEN" \
+  -F 'query=mutation ($file: File!) { add_file_to_update(file: $file, update_id: UPDATE_ID) { id } }' \
+  -F 'variables[file]=@/path/to/screenshot.png'
+```
+
+### Upload File to File Column
+Attach a file directly to an item's file column:
+
+```bash
+curl -X POST "https://api.monday.com/v2/file" \
+  -H "Authorization: $MONDAY_API_TOKEN" \
+  -F 'query=mutation ($file: File!) { add_file_to_column(file: $file, item_id: ITEM_ID, column_id: "files") { id } }' \
+  -F 'variables[file]=@/path/to/document.pdf'
+```
+
+### Supported File Types
+JPEG, PNG, GIF, PDF, Word/Doc, XLSX, CSV, SVG, TXT, MP4, AI (max 500 MB)
+
 ## Error Handling
 
 - **401/403**: Invalid or missing token - check $MONDAY_API_TOKEN
