@@ -34,6 +34,11 @@
       "name": "miro",
       "source": "./plugins/miro",
       "description": "Read and interpret Miro boards"
+    },
+    {
+      "name": "monday",
+      "source": "./plugins/monday",
+      "description": "Manage Monday.com tasks: list boards, query items, update status, assign yourself"
     }
   ]
 }

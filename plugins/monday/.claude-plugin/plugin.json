@@ -1,0 +1,8 @@
+{
+  "name": "monday",
+  "version": "1.0.0",
+  "description": "Manage Monday.com tasks: list boards, query items, update status, assign yourself",
+  "author": {
+    "name": "paddo"
+  }
+}
