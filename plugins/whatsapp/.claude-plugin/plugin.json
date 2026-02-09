@@ -1,0 +1,8 @@
+{
+  "name": "whatsapp",
+  "version": "1.0.0",
+  "description": "Search WhatsApp messages and retrieve media from the native macOS client database",
+  "author": {
+    "name": "paddo"
+  }
+}

@@ -12,6 +12,7 @@ claude plugin install dns@paddo-tools
 claude plugin install headless@paddo-tools
 claude plugin install mobile@paddo-tools
 claude plugin install miro@paddo-tools
+claude plugin install whatsapp@paddo-tools
 
 # or via slash command
 /plugin marketplace add paddo/claude-tools
@@ -21,6 +22,7 @@ claude plugin install miro@paddo-tools
 /plugin install headless@paddo-tools
 /plugin install mobile@paddo-tools
 /plugin install miro@paddo-tools
+/plugin install whatsapp@paddo-tools
 ```
 
 ## Plugins
@@ -33,6 +35,7 @@ claude plugin install miro@paddo-tools
 | **headless** | Headless browser automation for site comparison and E2E testing (`/headless:parity`, `/headless:test`) |
 | **mobile** | Mobile app testing for iOS, Android, React Native, Xamarin, Flutter (`/mobile:test`, `/mobile:parity`) |
 | **miro** | Read and interpret Miro boards (`/miro:board`) |
+| **whatsapp** | Search WhatsApp messages and retrieve media from native macOS client (`/whatsapp`) |
 
 ### Headless in action
 

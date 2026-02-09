@@ -39,6 +39,11 @@
       "name": "monday",
       "source": "./plugins/monday",
       "description": "Manage Monday.com tasks: list boards, query items, update status, assign yourself"
+    },
+    {
+      "name": "whatsapp",
+      "source": "./plugins/whatsapp",
+      "description": "Search WhatsApp messages and retrieve media from the native macOS client"
     }
   ]
 }
