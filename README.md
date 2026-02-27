@@ -29,7 +29,7 @@ claude plugin install whatsapp@paddo-tools
 
 | Plugin | Description |
 |--------|-------------|
-| **gemini-tools** | Gemini 3 Pro for visual analysis and UI mockup generation (`/gemini-tools:visual`, `/gemini-tools:mockup`) |
+| **gemini-tools** | Gemini models for visual analysis and UI mockup generation (`/gemini-tools:visual`, `/gemini-tools:mockup`) |
 | **codex** | OpenAI Codex for architecture analysis and code review (`/codex:review`) |
 | **dns** | Manage DNS records (`/dns:spaceship`, `/dns:godaddy`) |
 | **headless** | Headless browser automation for site comparison and E2E testing (`/headless:parity`, `/headless:test`) |

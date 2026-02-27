@@ -13,7 +13,7 @@ hooks:
 
 # Nano Banana - UI Mockup Generator
 
-Generate UI mockups using Gemini 3 Pro Image (Nano Banana Pro).
+Generate UI mockups using Gemini 3.1 Flash Image (Nano Banana 2).
 
 ## Setup
 
@@ -34,8 +34,8 @@ npx --prefix $(dirname $LIB) tsx $LIB "YOUR PROMPT HERE" --aspect 16:9 --size 2K
 ```
 
 Options:
-- `--aspect`: 1:1, 16:9, 9:16, 3:4, 21:9
-- `--size`: 1K, 2K, 4K
+- `--aspect`: 1:1, 1:4, 1:8, 2:3, 3:2, 3:4, 4:1, 4:3, 4:5, 5:4, 8:1, 9:16, 16:9, 21:9
+- `--size`: 512px, 1K (default), 2K, 4K
 
 The script outputs the image path and opens it automatically.
 

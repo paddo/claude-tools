@@ -8,16 +8,16 @@ if (!API_KEY) {
   process.exit(1);
 }
 
-// Parse args: prompt [--aspect 16:9] [--size 2K]
+// Parse args: prompt [--aspect 16:9] [--size 1K]
 const args = process.argv.slice(2);
 if (args.length === 0) {
-  console.error("Usage: nano-banana.ts <prompt> [--aspect 16:9] [--size 2K]");
+  console.error("Usage: nano-banana.ts <prompt> [--aspect 16:9] [--size 1K]");
   process.exit(1);
 }
 
 let prompt = "";
 let aspect = "16:9";
-let size = "2K";
+let size = "1K";
 
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--aspect" && args[i + 1]) {
@@ -43,7 +43,7 @@ const body = {
 };
 
 const url =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent";
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent";
 
 async function run() {
   const res = await fetch(url, {

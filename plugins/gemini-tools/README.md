@@ -1,6 +1,6 @@
 # gemini-tools
 
-Gemini 3 Pro for visual analysis, UI/UX work, and image generation.
+Gemini models for visual analysis, UI/UX work, and image generation.
 
 ## Commands
 
