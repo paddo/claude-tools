@@ -12,6 +12,7 @@ claude plugin install dns@paddo-tools
 claude plugin install headless@paddo-tools
 claude plugin install mobile@paddo-tools
 claude plugin install miro@paddo-tools
+claude plugin install monday@paddo-tools
 claude plugin install whatsapp@paddo-tools
 
 # or via slash command
@@ -22,6 +23,7 @@ claude plugin install whatsapp@paddo-tools
 /plugin install headless@paddo-tools
 /plugin install mobile@paddo-tools
 /plugin install miro@paddo-tools
+/plugin install monday@paddo-tools
 /plugin install whatsapp@paddo-tools
 ```
 
@@ -35,6 +37,7 @@ claude plugin install whatsapp@paddo-tools
 | **headless** | Headless browser automation for site comparison and E2E testing (`/headless:parity`, `/headless:test`) |
 | **mobile** | Mobile app testing for iOS, Android, React Native, Xamarin, Flutter (`/mobile:test`, `/mobile:parity`) |
 | **miro** | Read and interpret Miro boards (`/miro:board`) |
+| **monday** | Manage Monday.com tasks: list boards, update status, assign (`/monday:monday`) |
 | **whatsapp** | Search WhatsApp messages and retrieve media from native macOS client (`/whatsapp`) |
 
 ### Headless in action
@@ -80,7 +83,8 @@ Plugins need API keys. Set them via:
     "SPACESHIP_API_SECRET": "...",
     "GODADDY_API_KEY": "...",
     "GODADDY_API_SECRET": "...",
-    "MIRO_TOKEN": "..."
+    "MIRO_TOKEN": "...",
+    "MONDAY_API_TOKEN": "..."
   }
 }
 ```
