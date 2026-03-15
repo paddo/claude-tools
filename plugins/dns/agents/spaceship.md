@@ -20,23 +20,23 @@ Manage DNS records for domains on spaceship.com via API.
 **Base URL:** `https://spaceship.dev/api/v1`
 
 **Auth Headers:**
-- `X-Api-Key`: from $SPACESHIP_API_KEY
-- `X-Api-Secret`: from $SPACESHIP_API_SECRET
+- `X-Api-Key`: from $(printenv SPACESHIP_API_KEY)
+- `X-Api-Secret`: from $(printenv SPACESHIP_API_SECRET)
 
 ## Endpoints
 
 ### List Records
 ```bash
 curl -s "https://spaceship.dev/api/v1/dns/records/{domain}?take=500&skip=0" \
-  -H "X-Api-Key: $SPACESHIP_API_KEY" \
-  -H "X-Api-Secret: $SPACESHIP_API_SECRET" | jq
+  -H "X-Api-Key: $(printenv SPACESHIP_API_KEY)" \
+  -H "X-Api-Secret: $(printenv SPACESHIP_API_SECRET)" | jq
 ```
 
 ### Create/Update Records
 ```bash
 curl -s -X PUT "https://spaceship.dev/api/v1/dns/records/{domain}" \
-  -H "X-Api-Key: $SPACESHIP_API_KEY" \
-  -H "X-Api-Secret: $SPACESHIP_API_SECRET" \
+  -H "X-Api-Key: $(printenv SPACESHIP_API_KEY)" \
+  -H "X-Api-Secret: $(printenv SPACESHIP_API_SECRET)" \
   -H "Content-Type: application/json" \
   -d '{"force": true, "items": [RECORDS_JSON]}'
 ```
@@ -44,8 +44,8 @@ curl -s -X PUT "https://spaceship.dev/api/v1/dns/records/{domain}" \
 ### Delete Records
 ```bash
 curl -s -X DELETE "https://spaceship.dev/api/v1/dns/records/{domain}" \
-  -H "X-Api-Key: $SPACESHIP_API_KEY" \
-  -H "X-Api-Secret: $SPACESHIP_API_SECRET" \
+  -H "X-Api-Key: $(printenv SPACESHIP_API_KEY)" \
+  -H "X-Api-Secret: $(printenv SPACESHIP_API_SECRET)" \
   -H "Content-Type: application/json" \
   -d '[RECORDS_TO_DELETE]'
 ```

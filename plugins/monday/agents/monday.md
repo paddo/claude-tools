@@ -21,7 +21,7 @@ Manage Monday.com boards and items: list boards, query tasks, update status, ass
 
 **Auth Header:**
 ```
-Authorization: $MONDAY_API_TOKEN
+Authorization: $(printenv MONDAY_API_TOKEN)
 ```
 Note: No "Bearer" prefix - just the token directly.
 
@@ -29,7 +29,7 @@ Note: No "Bearer" prefix - just the token directly.
 
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "YOUR_GRAPHQL_QUERY"}'
 ```
@@ -39,7 +39,7 @@ curl -s "https://api.monday.com/v2" \
 ### List All Boards
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "{ boards(limit: 50) { id name description } }"}' | jq
 ```
@@ -47,7 +47,7 @@ curl -s "https://api.monday.com/v2" \
 ### Get Board Structure (columns, groups, users)
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "{ boards(ids: [BOARD_ID]) { name columns { id title type settings_str } groups { id title } owners { id name } subscribers { id name } } }"}' | jq
 ```
@@ -60,7 +60,7 @@ For status columns, parse `settings_str` JSON to get available labels:
 ### Get Board Items
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "{ boards(ids: [BOARD_ID]) { items_page(limit: 50) { cursor items { id name group { id title } column_values { id column { title } text value } } } } }"}' | jq
 ```
@@ -68,7 +68,7 @@ curl -s "https://api.monday.com/v2" \
 ### Get Items with Pagination
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "{ next_items_page(cursor: \"CURSOR\", limit: 50) { cursor items { id name column_values { id column { title } text value } } } }"}' | jq
 ```
@@ -76,7 +76,7 @@ curl -s "https://api.monday.com/v2" \
 ### Get Current User (for self-assignment)
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "{ me { id name email } }"}' | jq
 ```
@@ -84,7 +84,7 @@ curl -s "https://api.monday.com/v2" \
 ### Search Items by Name
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "{ items_page_by_column_values(board_id: BOARD_ID, limit: 50, columns: [{column_id: \"name\", column_values: [\"SEARCH_TERM\"]}]) { items { id name column_values { id column { title } text } } } }"}' | jq
 ```
@@ -95,7 +95,7 @@ curl -s "https://api.monday.com/v2" \
 Status values must be JSON strings with `label` key:
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "mutation { change_column_value(item_id: ITEM_ID, board_id: BOARD_ID, column_id: \"status\", value: \"{\\\"label\\\": \\\"Working on it\\\"}\") { id name } }"}' | jq
 ```
@@ -109,7 +109,7 @@ Common status labels (vary by board):
 ### Assign Person (simple value)
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "mutation { change_simple_column_value(item_id: ITEM_ID, board_id: BOARD_ID, column_id: \"people\", value: \"USER_ID\") { id name } }"}' | jq
 ```
@@ -117,7 +117,7 @@ curl -s "https://api.monday.com/v2" \
 ### Assign Multiple People
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "mutation { change_column_value(item_id: ITEM_ID, board_id: BOARD_ID, column_id: \"people\", value: \"{\\\"personsAndTeams\\\": [{\\\"id\\\": USER_ID, \\\"kind\\\": \\\"person\\\"}]}\") { id name } }"}' | jq
 ```
@@ -125,7 +125,7 @@ curl -s "https://api.monday.com/v2" \
 ### Create Item
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "mutation { create_item(board_id: BOARD_ID, group_id: \"GROUP_ID\", item_name: \"New Task\") { id name } }"}' | jq
 ```
@@ -215,7 +215,7 @@ Multiple people (full format):
 ### Add Update/Comment to Item
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "mutation { create_update(item_id: ITEM_ID, body: \"Your comment text here\") { id } }"}'
 ```
@@ -223,7 +223,7 @@ curl -s "https://api.monday.com/v2" \
 ### Get Updates for Item
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "{ items(ids: [ITEM_ID]) { updates(limit: 10) { id body created_at creator { name } } } }"}'
 ```
@@ -239,7 +239,7 @@ Attach a file (screenshot, image, document) to an existing update:
 
 ```bash
 curl -X POST "https://api.monday.com/v2/file" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -F 'query="mutation add_file($file: File!) { add_file_to_update(update_id: UPDATE_ID, file: $file) { id } }"' \
   -F 'map="{\"image\":\"variables.file\"}"' \
   -F 'image=@/path/to/screenshot.png'
@@ -249,7 +249,7 @@ curl -X POST "https://api.monday.com/v2/file" \
 1. First create an update to get its ID:
 ```bash
 curl -s "https://api.monday.com/v2" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d '{"query": "mutation { create_update(item_id: ITEM_ID, body: \"Screenshot attached below:\") { id } }"}'
 ```
@@ -257,7 +257,7 @@ curl -s "https://api.monday.com/v2" \
 2. Then upload the file to that update (note the `map` field):
 ```bash
 curl -X POST "https://api.monday.com/v2/file" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -F 'query="mutation add_file($file: File!) { add_file_to_update(update_id: UPDATE_ID, file: $file) { id } }"' \
   -F 'map="{\"image\":\"variables.file\"}"' \
   -F 'image=@/path/to/screenshot.png'
@@ -268,7 +268,7 @@ Attach a file directly to an item's file column:
 
 ```bash
 curl -X POST "https://api.monday.com/v2/file" \
-  -H "Authorization: $MONDAY_API_TOKEN" \
+  -H "Authorization: $(printenv MONDAY_API_TOKEN)" \
   -F 'query="mutation add_file($file: File!) { add_file_to_column(file: $file, item_id: ITEM_ID, column_id: \"files\") { id } }"' \
   -F 'map="{\"image\":\"variables.file\"}"' \
   -F 'image=@/path/to/document.pdf'
@@ -324,7 +324,7 @@ with urllib.request.urlopen(req) as response:
 
 ## Error Handling
 
-- **401/403**: Invalid or missing token - check $MONDAY_API_TOKEN
+- **401/403**: Invalid or missing token - check $(printenv MONDAY_API_TOKEN)
 - **400**: Invalid GraphQL query - check syntax and field names
 - **429**: Rate limited - wait and retry
 - **Column not found**: Column IDs vary by board - fetch structure first

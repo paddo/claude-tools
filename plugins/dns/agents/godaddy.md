@@ -21,7 +21,7 @@ Manage DNS records for domains on GoDaddy via API.
 
 **Auth Header:**
 ```
-Authorization: sso-key $GODADDY_API_KEY:$GODADDY_API_SECRET
+Authorization: sso-key $(printenv GODADDY_API_KEY):$(printenv GODADDY_API_SECRET)
 ```
 
 ## Endpoints
@@ -29,19 +29,19 @@ Authorization: sso-key $GODADDY_API_KEY:$GODADDY_API_SECRET
 ### List Records
 ```bash
 curl -s "https://api.godaddy.com/v1/domains/{domain}/records" \
-  -H "Authorization: sso-key $GODADDY_API_KEY:$GODADDY_API_SECRET" | jq
+  -H "Authorization: sso-key $(printenv GODADDY_API_KEY):$(printenv GODADDY_API_SECRET)" | jq
 ```
 
 ### List Records by Type
 ```bash
 curl -s "https://api.godaddy.com/v1/domains/{domain}/records/{type}" \
-  -H "Authorization: sso-key $GODADDY_API_KEY:$GODADDY_API_SECRET" | jq
+  -H "Authorization: sso-key $(printenv GODADDY_API_KEY):$(printenv GODADDY_API_SECRET)" | jq
 ```
 
 ### Add Records (PATCH)
 ```bash
 curl -s -X PATCH "https://api.godaddy.com/v1/domains/{domain}/records" \
-  -H "Authorization: sso-key $GODADDY_API_KEY:$GODADDY_API_SECRET" \
+  -H "Authorization: sso-key $(printenv GODADDY_API_KEY):$(printenv GODADDY_API_SECRET)" \
   -H "Content-Type: application/json" \
   -d '[RECORDS_JSON]'
 ```
@@ -49,7 +49,7 @@ curl -s -X PATCH "https://api.godaddy.com/v1/domains/{domain}/records" \
 ### Replace All Records of Type (PUT)
 ```bash
 curl -s -X PUT "https://api.godaddy.com/v1/domains/{domain}/records/{type}" \
-  -H "Authorization: sso-key $GODADDY_API_KEY:$GODADDY_API_SECRET" \
+  -H "Authorization: sso-key $(printenv GODADDY_API_KEY):$(printenv GODADDY_API_SECRET)" \
   -H "Content-Type: application/json" \
   -d '[RECORDS_JSON]'
 ```
@@ -57,7 +57,7 @@ curl -s -X PUT "https://api.godaddy.com/v1/domains/{domain}/records/{type}" \
 ### Replace Specific Record (PUT)
 ```bash
 curl -s -X PUT "https://api.godaddy.com/v1/domains/{domain}/records/{type}/{name}" \
-  -H "Authorization: sso-key $GODADDY_API_KEY:$GODADDY_API_SECRET" \
+  -H "Authorization: sso-key $(printenv GODADDY_API_KEY):$(printenv GODADDY_API_SECRET)" \
   -H "Content-Type: application/json" \
   -d '[RECORDS_JSON]'
 ```
