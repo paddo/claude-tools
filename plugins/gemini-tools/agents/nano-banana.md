@@ -41,6 +41,8 @@ The script outputs the image path and opens it automatically.
 
 ## Workflow
 
+**IMPORTANT: Only call the generation script ONCE per request. Do not regenerate or iterate unless the user explicitly asks for revisions.**
+
 1. If user mentions screenshot/clipboard: `pngpaste /tmp/nb-input.png` then Read the image
 2. Craft a detailed prompt with layout, colors, typography, device context
 3. Run the script with the prompt
