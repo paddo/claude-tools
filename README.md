@@ -34,7 +34,7 @@ claude plugin install whatsapp@paddo-tools
 | **gemini-tools** | Gemini models for visual analysis and UI mockup generation (`/gemini-tools:visual`, `/gemini-tools:mockup`) |
 | **codex** | OpenAI Codex for architecture analysis and code review (`/codex:review`) |
 | **dns** | Manage DNS records (`/dns:spaceship`, `/dns:godaddy`) |
-| **headless** | Headless browser automation for site comparison and E2E testing (`/headless:parity`, `/headless:test`) |
+| **headless** | Headless browser automation for site comparison, E2E testing, and anti-bot-aware web research (`/headless:parity`, `/headless:test`, `/headless:scout`) |
 | **mobile** | Mobile app testing for iOS, Android, React Native, Xamarin, Flutter (`/mobile:test`, `/mobile:parity`) |
 | **miro** | Read and interpret Miro boards (`/miro:board`) |
 | **monday** | Manage Monday.com tasks: list boards, update status, assign (`/monday:monday`) |
@@ -84,10 +84,15 @@ Plugins need API keys. Set them via:
     "GODADDY_API_KEY": "...",
     "GODADDY_API_SECRET": "...",
     "MIRO_TOKEN": "...",
-    "MONDAY_API_TOKEN": "..."
+    "MONDAY_API_TOKEN": "...",
+    "SCRAPE_DO_API_KEY": "..."
   }
 }
 ```
+
+`SCRAPE_DO_API_KEY` powers the `headless:scout` unlocker tier. Without it, scout
+still reads compliant sites via direct fetch/WebFetch but can't break anti-bot
+walls. Optional `SCOUT_MAX_CREDITS` caps per-run spend (default ~5000 credits).
 
 **2. Project settings** (`.claude/settings.local.json`) - per-project creds
 
