@@ -23,7 +23,7 @@
     {
       "name": "headless",
       "source": "./plugins/headless",
-      "description": "Headless browser automation for site comparison and E2E testing"
+      "description": "Headless browser automation for site comparison, E2E testing, and anti-bot-aware web research"
     },
     {
       "name": "mobile",
