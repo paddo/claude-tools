@@ -2,7 +2,7 @@
 name: codex
 description: Architecture analysis and research using OpenAI Codex
 model: opus
-tools: Read, Glob, Grep
+tools: Read, Glob, Grep, Bash
 hooks:
   PreToolUse:
     - matcher: "mcp__.*"
@@ -57,20 +57,28 @@ Keep responses concise but thorough. Structure as:
 4. **Recommendation**: Which option and why, including caveats and risks
 5. **Next Steps**: What questions remain or what to validate before proceeding
 
-## External Research
+## Running the Codex CLI
 
-When you need to run the Codex CLI, delegate to a subagent using the Task tool:
+Pipe the prompt in on **stdin** — `codex exec` reads it from there when given no prompt argument:
 
-```
-Task(
-  subagent_type: "general-purpose",
-  model: "haiku",
-  prompt: "Run: codex exec --sandbox read-only \"YOUR PROMPT HERE\" with a 5-minute timeout. Return only the final output.",
-  description: "Run Codex CLI"
-)
+```bash
+cat << 'EOF' | codex exec --sandbox read-only
+<your prompt — parentheses, "quotes" and $dollars are all safe here>
+EOF
 ```
 
-**CRITICAL**: Do NOT run Codex directly via Bash - always delegate to the Task subagent. This avoids shell parsing issues with parentheses and special characters in prompts, and minimizes token costs.
+The quoted heredoc (`<< 'EOF'`) is what makes this safe: nothing in the prompt is
+interpreted by the shell. Passing the prompt as an argument instead invites the
+shell to mangle parentheses, quotes and `$`, which is what a previous version of
+this agent tried to dodge by delegating to a subagent — but that indirection is
+unnecessary, and it silently did nothing when the Task tool wasn't available.
+
+Add `--skip-git-repo-check` when the working directory isn't a git repo. Use a
+generous Bash timeout (5+ minutes): a real analysis run is not fast.
+
+**Your final message is the report.** Never finish without writing your findings
+into it. If the CLI errors or you cannot read what you were asked to review, say
+exactly that in one line — returning nothing is the one outcome that is useless.
 
 ## What You're NOT
 
