@@ -44,6 +44,11 @@
       "name": "whatsapp",
       "source": "./plugins/whatsapp",
       "description": "Search WhatsApp messages and retrieve media from the native macOS client"
+    },
+    {
+      "name": "hermes-tweet",
+      "source": "./plugins/hermes-tweet",
+      "description": "Guide Hermes Agent X/Twitter research, monitoring, and approval-gated action planning"
     }
   ]
 }
