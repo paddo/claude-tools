@@ -44,6 +44,16 @@
       "name": "whatsapp",
       "source": "./plugins/whatsapp",
       "description": "Search WhatsApp messages and retrieve media from the native macOS client"
+    },
+    {
+      "name": "kimi",
+      "source": "./plugins/kimi",
+      "description": "Launch Kimi K3 for second-opinion code review"
+    },
+    {
+      "name": "grok",
+      "source": "./plugins/grok",
+      "description": "Launch Grok for second-opinion code review"
     }
   ]
 }
