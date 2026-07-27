@@ -2,7 +2,7 @@
 name: godaddy
 description: Manage DNS records via GoDaddy API
 model: haiku
-tools: Bash
+tools: Bash, SendMessage
 hooks:
   PreToolUse:
     - matcher: "mcp__.*"
@@ -154,3 +154,14 @@ CNAME   www     example.com Auto  DNS only
 - Extract domain from user's request if not explicit
 - "Auto" or unspecified TTL → use 600
 - Subdomain records: if user says "for mail.example.com", record names like `foo.mail` are relative to root domain
+
+## Delivering your report
+
+**Your final message is the report.** Never finish without writing your findings
+into it. If a command fails or you cannot do what was asked, say exactly that in
+one line - returning nothing is the one outcome that is useless.
+
+A named agent's final message is never delivered: the caller is only told you
+went idle. Send the report with SendMessage to `main` first, then repeat it as
+your final message. Do both every time - you cannot tell from inside which way
+you were spawned.

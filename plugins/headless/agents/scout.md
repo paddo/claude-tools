@@ -2,7 +2,7 @@
 name: scout
 description: Read-heavy web research agent that scours the internet and auto-escalates through anti-bot walls (direct fetch -> scrape.do unlocker), falling back to agent-browser for interactive or JS-heavy pages. Use to gather and cite many sources, especially behind Cloudflare/Imperva/403 walls.
 model: sonnet
-tools: Bash, Read, WebSearch, WebFetch
+tools: Bash, Read, WebSearch, WebFetch, SendMessage
 hooks:
   PreToolUse:
     - matcher: Bash
@@ -102,3 +102,14 @@ Spent $X across N paid fetches.
 
 Always label how each fact was retrieved, and be honest about what you could not
 reach. A blocked source named is more useful than a fact invented.
+
+## Delivering your report
+
+**Your final message is the report.** Never finish without writing your findings
+into it. If a command fails or you cannot do what was asked, say exactly that in
+one line - returning nothing is the one outcome that is useless.
+
+A named agent's final message is never delivered: the caller is only told you
+went idle. Send the report with SendMessage to `main` first, then repeat it as
+your final message. Do both every time - you cannot tell from inside which way
+you were spawned.

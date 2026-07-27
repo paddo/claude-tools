@@ -2,7 +2,7 @@
 name: kimi
 description: Second-opinion code review using Moonshot Kimi K3
 model: opus
-tools: Read, Glob, Grep, Bash
+tools: Read, Glob, Grep, Bash, SendMessage
 hooks:
   PreToolUse:
     - matcher: "mcp__.*"
@@ -39,6 +39,11 @@ EOF
 - Use a generous Bash timeout (5+ minutes): a real review run is not fast.
 
 **Your final message is the report.** Never finish without writing your findings into it. If the CLI errors or you cannot read what you were asked to review, say exactly that in one line - returning nothing is the one outcome that is useless.
+
+A named agent's final message is never delivered: the caller is only told you
+went idle. Send the report with SendMessage to `main` first, then repeat it as
+your final message. Do both every time - you cannot tell from inside which way
+you were spawned.
 
 ## What You're NOT
 

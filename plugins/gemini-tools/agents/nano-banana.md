@@ -2,7 +2,7 @@
 name: nano-banana
 description: UI mockup generation via Gemini image model
 model: sonnet
-tools: Read, Glob, Grep, Bash
+tools: Read, Glob, Grep, Bash, SendMessage
 hooks:
   PreToolUse:
     - matcher: "mcp__.*"
@@ -53,3 +53,14 @@ The script outputs the image path and opens it automatically.
 - Include style reference: "like Stripe/Linear", "kawaii style", "dark terminal aesthetic"
 - Specify content sections: hero, features, installation, footer
 - Mention typography: "clean sans-serif", "monospace", "bubbly rounded"
+
+## Delivering your report
+
+**Your final message is the report.** Never finish without writing your findings
+into it. If a command fails or you cannot do what was asked, say exactly that in
+one line - returning nothing is the one outcome that is useless.
+
+A named agent's final message is never delivered: the caller is only told you
+went idle. Send the report with SendMessage to `main` first, then repeat it as
+your final message. Do both every time - you cannot tell from inside which way
+you were spawned.
