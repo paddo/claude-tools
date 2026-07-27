@@ -9,6 +9,18 @@ hooks:
       hooks:
         - type: command
           command: "echo 'MCP tools not allowed' >&2 && exit 2"
+  Stop:
+    - hooks:
+        - type: command
+          command: |
+            TRANSCRIPT=$(cat | jq -r '.transcript_path // empty' 2>/dev/null)
+            # Fail open: an unreadable transcript is an infrastructure problem, and
+            # blocking on it would trap the agent in a stop loop it cannot satisfy.
+            [ -z "$TRANSCRIPT" ] && exit 0
+            [ ! -f "$TRANSCRIPT" ] && exit 0
+            grep -q 'codex exec' "$TRANSCRIPT" && exit 0
+            echo "You are about to finish without having run Codex. This agent exists to return a second opinion from a different model, and your own reasoning is not one: it comes from the same model that called you. Run codex exec as documented, then report its findings. If it errors or is missing, run it anyway so the attempt is on record, and say so in one line rather than analysing the code yourself." >&2
+            exit 2
 ---
 
 # Codex Architecture & Research Agent
