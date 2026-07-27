@@ -6,6 +6,12 @@ description: Launch Grok for a second-opinion code review
 
 Delegate this to the **grok** agent to handle independently.
 
+Spawn it unnamed. With agent teams enabled, a name makes this a teammate rather
+than a subagent, and on that path the agent definition is appended to a stock
+teammate prompt instead of becoming the system prompt, while frontmatter hooks
+are not applied at all. A named spawn then skips the CLI and returns its own
+analysis, which is the one result this agent must never produce.
+
 Give it a report path in its prompt: a file in your scratchpad directory if you
 have one, otherwise `mktemp`. Tell it to write the report there. A named agent's
 final message never reaches you, so if it finishes having sent nothing, read that

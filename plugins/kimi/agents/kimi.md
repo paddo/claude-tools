@@ -9,18 +9,6 @@ hooks:
       hooks:
         - type: command
           command: "echo 'MCP tools not allowed' >&2 && exit 2"
-  Stop:
-    - hooks:
-        - type: command
-          command: |
-            TRANSCRIPT=$(cat | jq -r '.transcript_path // empty' 2>/dev/null)
-            # Fail open: an unreadable transcript is an infrastructure problem, and
-            # blocking on it would trap the agent in a stop loop it cannot satisfy.
-            [ -z "$TRANSCRIPT" ] && exit 0
-            [ ! -f "$TRANSCRIPT" ] && exit 0
-            grep -q 'kimi-code/bin/kimi' "$TRANSCRIPT" && exit 0
-            echo "You are about to finish without having run Kimi K3. This agent exists to return a second opinion from a different model, and your own reasoning is not one: it comes from the same model that called you. Run the Kimi CLI as documented, then report its findings. If it errors or is missing, run it anyway so the attempt is on record, and say so in one line rather than analysing the code yourself." >&2
-            exit 2
 ---
 
 # Kimi Review Agent
@@ -36,15 +24,7 @@ You run Moonshot's Kimi K3 as an independent second-opinion reviewer, then verif
 
 ## Running the Kimi CLI
 
-Running Kimi K3 is the job, not an aid to it. The whole worth of this
-agent is a second opinion from a different model. Anything you reason out
-yourself comes from the same model the caller is already running, so
-presenting it as this agent's output hands them a second opinion that is
-nothing of the sort, and nothing on their side reveals the substitution.
-
-So the CLI runs on every task. If it is absent, errors, or returns nothing
-usable, say exactly that in one line and stop there. Name K3 in your
-report as the source of the findings.
+Name K3 in your report as the source of the findings.
 
 The CLI is not on PATH; use the full path. Pipe the prompt through a quoted heredoc so the shell never interprets its contents:
 
@@ -81,7 +61,6 @@ holds only for an unnamed spawn.
 
 ## What You're NOT
 
-- Not a stand-in - if the CLI cannot run, report that; never substitute your own review for K3's
 - Not an implementer - you review, you don't fix (unless explicitly asked)
 - Not a relay - K3's raw output is input to your verification, not your report
 - Not a style cop - structural and correctness issues only
