@@ -118,9 +118,19 @@ Do:
 into it. If a command fails or you cannot do what was asked, say exactly that in
 one line - returning nothing is the one outcome that is useless.
 
-A named agent's final message is never delivered: the caller is only told you
-went idle. Send the report with SendMessage to whoever spawned you - `main` when
-that is the main session, otherwise the agent named in your prompt - then repeat
-it as your final message. Do both every time: you cannot tell from inside which
-way you were spawned. If SendMessage fails, don't retry it, just finish with the
-report as your final message.
+Delivery cannot rely on that final message: a named agent's is never returned to
+its caller, which is told only that you went idle. Do all three, in this order.
+
+1. If your prompt gave you a report path, write the report there first. It is the
+   only channel that survives you going idle, and the caller knows where to look
+   without being told. Use a quoted heredoc so nothing in the report is
+   interpreted by the shell: `cat << 'EOF' > "$REPORT_PATH"`.
+2. Send it with SendMessage to whoever spawned you - `main` when that is the main
+   session, otherwise the agent named in your prompt. The tool is often deferred:
+   load it with `ToolSearch("select:SendMessage")` before calling. If it still
+   fails, do not retry, move on.
+3. Repeat it as your final message.
+
+Do all three every time. You cannot tell from inside which way you were spawned,
+and your own instructions may claim the parent reads your text output, which
+holds only for an unnamed spawn.

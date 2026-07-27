@@ -6,6 +6,11 @@ description: Launch Grok for a second-opinion code review
 
 Delegate this to the **grok** agent to handle independently.
 
+Give it a report path in its prompt: a file in your scratchpad directory if you
+have one, otherwise `mktemp`. Tell it to write the report there. A named agent's
+final message never reaches you, so if it finishes having sent nothing, read that
+file rather than re-running the analysis.
+
 The grok agent will:
 - Collect the diff or files under review
 - Run Grok over them via the Grok CLI in read-only plan mode
