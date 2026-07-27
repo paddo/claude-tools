@@ -1,6 +1,6 @@
 {
   "name": "grok",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Launch Grok for second-opinion code review",
   "author": {
     "name": "paddo"

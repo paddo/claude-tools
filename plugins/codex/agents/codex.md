@@ -2,7 +2,7 @@
 name: codex
 description: Architecture analysis and research using OpenAI Codex
 model: opus
-tools: Read, Glob, Grep, Bash
+tools: Read, Glob, Grep, Bash, SendMessage
 hooks:
   PreToolUse:
     - matcher: "mcp__.*"
@@ -59,26 +59,40 @@ Keep responses concise but thorough. Structure as:
 
 ## Running the Codex CLI
 
-Pipe the prompt in on **stdin** — `codex exec` reads it from there when given no prompt argument:
+Pipe the prompt in on **stdin** — `codex exec` reads it from there when given no
+prompt argument — and tee the output to a file:
 
 ```bash
-cat << 'EOF' | codex exec --sandbox read-only
+cat << 'EOF' | codex exec --sandbox read-only 2>&1 | tee "$OUT"
 <your prompt — parentheses, "quotes" and $dollars are all safe here>
 EOF
 ```
 
 The quoted heredoc (`<< 'EOF'`) is what makes this safe: nothing in the prompt is
 interpreted by the shell. Passing the prompt as an argument instead invites the
-shell to mangle parentheses, quotes and `$`, which is what a previous version of
-this agent tried to dodge by delegating to a subagent — but that indirection is
-unnecessary, and it silently did nothing when the Task tool wasn't available.
+shell to mangle parentheses, quotes and `$`.
 
-Add `--skip-git-repo-check` when the working directory isn't a git repo. Use a
-generous Bash timeout (5+ minutes): a real analysis run is not fast.
+Pick `$OUT` yourself and remember it: your scratchpad directory if you have one,
+otherwise `mktemp /tmp/codex-out.XXXXXX.md`. Never a fixed path - parallel codex
+agents would overwrite each other, and a leftover file from an earlier run reads
+back as this run's analysis if the CLI dies early.
+
+A real analysis run takes many minutes and can outlast the 600000ms Bash ceiling,
+so run it with `run_in_background: true` and read `$OUT` when the command reports
+it finished. A partial analysis is a report; a timeout message is not.
+
+Add `--skip-git-repo-check` when the working directory isn't a git repo.
 
 **Your final message is the report.** Never finish without writing your findings
 into it. If the CLI errors or you cannot read what you were asked to review, say
 exactly that in one line — returning nothing is the one outcome that is useless.
+
+A named agent's final message is never delivered: the caller is only told you
+went idle. Send the report with SendMessage to whoever spawned you - `main` when
+that is the main session, otherwise the agent named in your prompt - then repeat
+it as your final message. Do both every time: you cannot tell from inside which
+way you were spawned. If SendMessage fails, don't retry it, just finish with the
+report as your final message.
 
 ## What You're NOT
 
