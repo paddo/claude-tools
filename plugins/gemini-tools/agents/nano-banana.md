@@ -61,6 +61,8 @@ into it. If a command fails or you cannot do what was asked, say exactly that in
 one line - returning nothing is the one outcome that is useless.
 
 A named agent's final message is never delivered: the caller is only told you
-went idle. Send the report with SendMessage to `main` first, then repeat it as
-your final message. Do both every time - you cannot tell from inside which way
-you were spawned.
+went idle. Send the report with SendMessage to whoever spawned you - `main` when
+that is the main session, otherwise the agent named in your prompt - then repeat
+it as your final message. Do both every time: you cannot tell from inside which
+way you were spawned. If SendMessage fails, don't retry it, just finish with the
+report as your final message.
