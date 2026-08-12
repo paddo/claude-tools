@@ -14,6 +14,7 @@ claude plugin install mobile@paddo-tools
 claude plugin install miro@paddo-tools
 claude plugin install monday@paddo-tools
 claude plugin install whatsapp@paddo-tools
+claude plugin install hermes-tweet@paddo-tools
 
 # or via slash command
 /plugin marketplace add paddo/claude-tools
@@ -25,6 +26,7 @@ claude plugin install whatsapp@paddo-tools
 /plugin install miro@paddo-tools
 /plugin install monday@paddo-tools
 /plugin install whatsapp@paddo-tools
+/plugin install hermes-tweet@paddo-tools
 ```
 
 ## Plugins
@@ -39,6 +41,7 @@ claude plugin install whatsapp@paddo-tools
 | **miro** | Read and interpret Miro boards (`/miro:board`) |
 | **monday** | Manage Monday.com tasks: list boards, update status, assign (`/monday:monday`) |
 | **whatsapp** | Search WhatsApp messages and retrieve media from native macOS client (`/whatsapp`) |
+| **hermes-tweet** | Guide Hermes Agent X/Twitter route discovery, research, and confirmed actions |
 
 ### Headless in action
 
@@ -85,6 +88,7 @@ Plugins need API keys. Set them via:
     "GODADDY_API_SECRET": "...",
     "MIRO_TOKEN": "...",
     "MONDAY_API_TOKEN": "...",
+    "XQUIK_API_KEY": "...",
     "SCRAPE_DO_API_KEY": "..."
   }
 }
