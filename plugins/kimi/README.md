@@ -1,18 +1,22 @@
 # kimi
 
-Launch Moonshot's Kimi K3 for a second-opinion code review inside Claude Code.
+Run an independent Kimi CLI review from Claude Code or Codex.
+The calling host verifies each finding against the code before reporting it.
 
-## Commands
+## Use
 
-- `/kimi:review [scope]` - review the working diff (default), a branch, a PR, or named files
+- Claude Code: `/kimi:review [scope]`.
+- Codex: select `review` from the `kimi` plugin, or request a Kimi review.
 
-## How it works
-
-The `kimi` agent collects the diff, runs Kimi K3 over it headlessly via the Kimi Code CLI (`kimi -p`), then verifies every finding against the actual code before reporting. K3 finds; the agent filters. Confirmed findings come back ranked by severity with file:line references.
-
-The reviewer never gets write access: the CLI runs without `--yolo`, so it cannot modify the tree.
+Scope can specify a branch, PR, or files.
+The default includes changes against the default branch and local changes.
+The CLI uses its configured model and account.
+Prompt mode uses auto permissions and rejects `--plan`. The prompt requests review without file changes.
+This mode does not enforce read-only tool access.
 
 ## Requirements
 
-- [Kimi Code CLI](https://moonshotai.github.io/kimi-code/) installed at `~/.kimi-code/bin/kimi` and signed in (`kimi login`) with a Kimi subscription
-- Review runs draw from the subscription's usage limits
+Install and authenticate [Kimi Code CLI](https://moonshotai.github.io/kimi-code/) at `~/.kimi-code/bin/kimi`.
+Review runs use the configured account's usage limits.
+See the [Kimi command reference](https://moonshotai.github.io/kimi-code/en/reference/kimi-command).
+See the [marketplace setup](../../README.md#install).

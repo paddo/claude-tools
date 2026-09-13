@@ -1,0 +1,18 @@
+{
+  "name": "mobile",
+  "version": "2.1.4",
+  "description": "AI-driven mobile testing with Appium: single app, cross-platform parity, migration comparison",
+  "author": {
+    "name": "paddo"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Mobile",
+    "shortDescription": "AI-driven mobile testing with Appium: single app, cross-platform parity, migrati",
+    "longDescription": "AI-driven mobile testing with Appium: single app, cross-platform parity, migration comparison",
+    "developerName": "paddo",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Use mobile for this task."
+  }
+}

@@ -3,6 +3,7 @@ import { spawn } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import * as http from "http";
+import { fileURLToPath } from "url";
 
 type Platform = "ios" | "android";
 type AppType = "native" | "flutter";
@@ -175,7 +176,7 @@ async function ensureAppium(port: number): Promise<void> {
   if (await isAppiumRunning(port)) return;
 
   // Start local Appium from node_modules - detached so it survives process exit
-  const libDir = path.dirname(new URL(import.meta.url).pathname);
+  const libDir = path.dirname(fileURLToPath(import.meta.url));
   const appiumBin = path.join(libDir, "node_modules", ".bin", "appium");
 
   if (!fs.existsSync(appiumBin)) {
@@ -264,6 +265,10 @@ async function createDriver(platform: Platform, appId: string, opts: Record<stri
           "appium:udid": opts.serial || undefined,
           "appium:noReset": true,
         };
+  }
+
+  if (platform === "ios" && opts["wda-local-port"]) {
+    capabilities["appium:wdaLocalPort"] = Number(opts["wda-local-port"]);
   }
 
   // Remove undefined values
@@ -624,7 +629,7 @@ async function main() {
     switch (command) {
       case "start-ios":
         if (positional.length < 1) {
-          console.error("Usage: driver.ts start-ios <bundle-id> [--udid=<simulator>] [--flutter]");
+          console.error("Usage: driver.ts start-ios <bundle-id> [--udid=<simulator>] [--wda-local-port=<port>] [--flutter]");
           process.exit(1);
         }
         await startSingle("ios", positional[0], opts);

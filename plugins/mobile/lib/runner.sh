@@ -6,7 +6,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOG_DIR="${MAESTRO_DEV_LOGS:-/tmp/maestro-dev}"
-mkdir -p "$LOG_DIR"
+if [[ "${1:-}" != "shell-cmd" ]]; then
+  mkdir -p "$LOG_DIR"
+fi
 
 # JSON log helper
 log_json() {
@@ -412,16 +414,12 @@ case "${1:-help}" in
     list_devices
     ;;
   shell-cmd)
-    # Print command for user to run in their terminal
-    cat <<EOF
-# Run this in your terminal:
-export PATH="\$HOME/.maestro/bin:\$PATH"
-$SCRIPT_DIR/runner.sh dev ${2:-ios} ${3:-com.example.app} ${4:-.} ${5:-./flows/smoke.yaml} ${6:+"\"$6\""}
-
-# Claude can read logs with:
-# cat /tmp/maestro-dev/runner.log | jq -r '.msg'
-# cat /tmp/maestro-dev/device.log | jq '.eventMessage'
-EOF
+    printf 'export PATH="$HOME/.maestro/bin:$PATH"\n'
+    printf '%q ' "$SCRIPT_DIR/runner.sh" dev "${2:-ios}" "${3:-com.example.app}" "${4:-.}" "${5:-./flows/smoke.yaml}"
+    if [[ -n "${6:-}" ]]; then
+      printf '%q ' "$6"
+    fi
+    printf '\n'
     ;;
 
   *)

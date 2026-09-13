@@ -1,0 +1,18 @@
+{
+  "name": "miro",
+  "version": "1.1.3",
+  "description": "Read and interpret Miro boards",
+  "author": {
+    "name": "paddo"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Miro",
+    "shortDescription": "Read and interpret Miro boards",
+    "longDescription": "Read and interpret Miro boards",
+    "developerName": "paddo",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Use miro for this task."
+  }
+}

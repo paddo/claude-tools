@@ -1,6 +1,6 @@
 # codex
 
-Launch OpenAI Codex CLI for software architecture analysis, research, and senior-level technical insights.
+Run Codex CLI for architecture analysis, research, and code review from Claude Code or Codex.
 
 ## When to use
 
@@ -17,23 +17,27 @@ Launch OpenAI Codex CLI for software architecture analysis, research, and senior
 npm install -g @openai/codex
 ```
 
-### 2. Set API key
+### 2. Authenticate
 
 ```bash
-export OPENAI_API_KEY="your-key"
+codex login
 ```
 
-Add to `~/.zshrc` or `~/.bashrc` to persist.
+Use the CLI's configured account and model.
 
 ## Usage
 
 ```
-/codex should I use a monorepo or polyrepo for this project?
-/codex review the authentication architecture
-/codex what's the best way to handle real-time updates here?
+/codex:review compare monorepo and polyrepo options
+/codex:review review the authentication architecture
+/codex:review assess the real-time update design
 ```
 
 ## Dependencies
 
 - [Codex CLI](https://github.com/openai/codex) (`npm install -g @openai/codex`)
-- `OPENAI_API_KEY` environment variable
+- Configured Codex authentication
+
+In Codex, select `review` from the `codex` plugin.
+The skill starts an independent CLI process in read-only mode.
+See the [marketplace setup](../../README.md#install).

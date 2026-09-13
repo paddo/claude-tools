@@ -1,18 +1,19 @@
 # grok
 
-Launch Grok for a second-opinion code review inside Claude Code.
+Run an independent Grok CLI review from Claude Code or Codex.
+The calling host verifies each finding against the code before reporting it.
 
-## Commands
+## Use
 
-- `/grok:review [scope]` - review the working diff (default), a branch, a PR, or named files
+- Claude Code: `/grok:review [scope]`.
+- Codex: select `review` from the `grok` plugin, or request a Grok review.
 
-## How it works
-
-The `grok` agent collects the diff, runs Grok over it headlessly via the Grok CLI (`grok -p --permission-mode plan`), then verifies every finding against the actual code before reporting. Grok finds; the agent filters. Confirmed findings come back ranked by severity with file:line references.
-
-The reviewer never gets write access: plan mode is enforced on every run, so the CLI cannot modify the tree.
+Scope can specify a branch, PR, or files.
+The default includes changes against the default branch and local changes.
+The CLI runs in plan mode and uses its configured model and account.
 
 ## Requirements
 
-- Grok CLI installed (`~/.grok/bin/grok`) and signed in with an X/SuperGrok subscription
-- Review runs draw from the subscription's usage limits
+Install and authenticate Grok CLI on PATH.
+The CLI must support plan mode. Review runs use the configured account's usage limits.
+See the [marketplace setup](../../README.md#install).

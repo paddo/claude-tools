@@ -1,6 +1,6 @@
 {
   "name": "paddo-tools",
-  "description": "Collection of Claude Code plugins for DNS management, AI-assisted architecture, visual design, testing, and framework migration",
+  "description": "Shared Claude Code and Codex plugins for DNS, code review, visual design, testing, and framework migration",
   "owner": {
     "name": "paddo"
   },
@@ -54,6 +54,11 @@
       "name": "grok",
       "source": "./plugins/grok",
       "description": "Launch Grok for second-opinion code review"
+    },
+    {
+      "name": "claude",
+      "source": "./plugins/claude",
+      "description": "Run Claude CLI for independent code review"
     }
   ]
 }

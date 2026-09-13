@@ -1,6 +1,6 @@
 {
   "name": "gemini-tools",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Gemini models for visual analysis, UI/UX work, and image generation",
   "author": {
     "name": "paddo"

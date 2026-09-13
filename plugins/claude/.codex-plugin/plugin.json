@@ -1,0 +1,18 @@
+{
+  "name": "claude",
+  "version": "1.0.0",
+  "description": "Run Claude CLI for independent code review",
+  "author": {
+    "name": "paddo"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Claude",
+    "shortDescription": "Review code with Claude CLI.",
+    "longDescription": "Run an independent Claude review and verify its findings against the code.",
+    "developerName": "paddo",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Use Claude to review my changes."
+  }
+}

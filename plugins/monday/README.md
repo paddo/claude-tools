@@ -9,23 +9,22 @@ Manage Monday.com tasks: list boards, query items, update status, assign yoursel
    - My Access Tokens → Show (or Generate)
    - Copy the token
 
-2. Add to Claude settings (`~/.claude/settings.json`):
-   ```json
-   {
-     "env": {
-       "MONDAY_API_TOKEN": "your_token_here"
-     }
-   }
+2. Export the token before starting Claude Code or Codex:
+   ```bash
+   export MONDAY_API_TOKEN="your_token_here"
    ```
 
 ## Usage
 
 ```
-/monday list boards              # Show all boards
-/monday items BOARD_ID           # List items on a board
-/monday status ITEM_ID "Done"    # Update item status
-/monday assign ITEM_ID           # Assign yourself to item
+/monday:monday list boards
+/monday:monday items BOARD_ID
+/monday:monday status ITEM_ID "Done"
+/monday:monday assign ITEM_ID
 ```
+
+In Codex, select `monday` from the `monday` plugin.
+See the [marketplace setup](../../README.md#install).
 
 ## Commands
 

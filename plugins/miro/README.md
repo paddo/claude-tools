@@ -9,21 +9,20 @@ Read and interpret Miro boards - extracts structure, content, and relationships.
    - Create a new app or use existing
    - Copy the access token
 
-2. Add to Claude settings (`~/.claude/settings.json`):
-   ```json
-   {
-     "env": {
-       "MIRO_TOKEN": "your_token_here"
-     }
-   }
+2. Export the token before starting Claude Code or Codex:
+   ```bash
+   export MIRO_TOKEN="your_token_here"
    ```
 
 ## Usage
 
 ```
-/miro:board https://miro.com/app/board/uXjV...=/
-/miro:board uXjV...=
+/miro:miro https://miro.com/app/board/uXjV...=/
+/miro:miro uXjV...=
 ```
+
+In Codex, select `miro` from the `miro` plugin.
+See the [marketplace setup](../../README.md#install).
 
 ## What It Does
 

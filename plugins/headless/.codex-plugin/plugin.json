@@ -1,0 +1,18 @@
+{
+  "name": "headless",
+  "version": "0.5.3",
+  "description": "Headless browser automation for site comparison, E2E testing, and anti-bot-aware web research",
+  "author": {
+    "name": "paddo"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Headless",
+    "shortDescription": "Headless browser automation for site comparison, E2E testing, and anti-bot-aware",
+    "longDescription": "Headless browser automation for site comparison, E2E testing, and anti-bot-aware web research",
+    "developerName": "paddo",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Use headless for this task."
+  }
+}
