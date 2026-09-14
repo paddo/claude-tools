@@ -14,11 +14,18 @@ Run Codex CLI even when Codex hosts this skill. Use its output as the source of 
 
 Write the prompt with a quoted heredoc. Choose a delimiter absent from the prompt.
 
+On macOS, Codex's sandbox can block Chrome's application registration, including headless launches through rendering scripts.
+Keep Chrome rendering and screenshots in the calling session, using its existing permissions or browser connector.
+Include the browser constraint below in every delegated prompt, including follow-up prompts.
+If the caller cannot render, report the missing verification. Do not retry blocked launches or disable the sandbox.
+
 ```bash
 REVIEW_PROMPT=$(mktemp /tmp/codex-review-prompt.XXXXXX)
 REVIEW_OUTPUT=$(mktemp /tmp/codex-review-output.XXXXXX)
 cat << 'CODEX_REVIEW_INPUT' > "$REVIEW_PROMPT"
 Perform this analysis yourself. Do not invoke the codex review plugin or another review CLI.
+On macOS, do not launch Chrome from this sandbox, directly or through rendering scripts.
+Return required Chrome rendering commands to the caller for execution. Continue the analysis with available evidence.
 <question, project context, scope, and review material>
 CODEX_REVIEW_INPUT
 codex exec --sandbox read-only --output-last-message "$REVIEW_OUTPUT" - < "$REVIEW_PROMPT"

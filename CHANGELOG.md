@@ -1,5 +1,11 @@
 # Release Notes
 
+## 2026-09-14
+
+Codex `1.0.10` keeps macOS Chrome rendering in the calling session.
+Delegated prompts prohibit Chrome launches inside the sandbox and return rendering commands to the caller.
+This avoids application-registration crashes during headless rendering. The sandbox remains enabled.
+
 ## 2026-09-13
 
 All 11 plugins now provide Claude Code and Codex manifests.
