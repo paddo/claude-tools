@@ -1,5 +1,13 @@
 # Release Notes
 
+## 2026-09-23
+
+Grok `1.0.7` stops headless reviews from ending early.
+Headless Grok ended its turn when a tool call needed a permission prompt, and it still exited 0 with a partial answer.
+Reviews now use `dontAsk` mode with read-only tools and no subagents, so no call needs a prompt.
+Grok no longer loads Claude skills, hooks, MCP servers, or instructions during a review. A Claude review skill had redirected it.
+The prompt now goes through `--prompt-file`.
+
 ## 2026-09-14
 
 Codex `1.0.10` keeps macOS Chrome rendering in the calling session.
