@@ -23,11 +23,18 @@ REVIEW_OUTPUT=$(mktemp /tmp/grok-review-output.XXXXXX)
 cat << 'GROK_REVIEW_INPUT' > "$REVIEW_PROMPT"
 <review request, diff, and surrounding code>
 GROK_REVIEW_INPUT
-grok --permission-mode plan -p "$(cat "$REVIEW_PROMPT")" > "$REVIEW_OUTPUT"
+GROK_CLAUDE_SKILLS_ENABLED=false GROK_CLAUDE_HOOKS_ENABLED=false GROK_CLAUDE_MCPS_ENABLED=false \
+GROK_CLAUDE_RULES_ENABLED=false GROK_CLAUDE_AGENTS_ENABLED=false \
+grok --prompt-file "$REVIEW_PROMPT" --permission-mode dontAsk --no-subagents \
+  --tools read_file,grep,list_dir > "$REVIEW_OUTPUT"
 ```
 
-Run from the target repository. Grok can read surrounding files in plan mode.
-Keep plan mode. Do not enable automatic tool approval for review.
+Run from the target repository. Grok reads surrounding files with read-only tools. It has no shell, so put the diff in the prompt.
+Keep every flag and variable above. Do not enable automatic tool approval.
+- Headless Grok ends the turn when a tool call needs a permission prompt. It still exits 0 with a partial answer. `dontAsk` and the read-only tool list prevent the prompt.
+- By default Grok loads Claude skills, hooks, MCP servers, and instructions. A Claude review skill can make Grok follow that skill instead of the prompt. The variables turn this off.
+- `--prompt-file` avoids the 128 KB limit on one command-line argument.
+- Treat an answer that stops before any findings or a clear "no findings" statement as a failed run. Report it as a CLI failure.
 Start the CLI with the host's background-process or yielding shell support.
 In Claude Code, set Bash `run_in_background: true` and wait with `TaskOutput`.
 Keep the process handle when the host shell returns before completion. Wait, then read `REVIEW_OUTPUT`.
