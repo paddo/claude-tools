@@ -89,9 +89,11 @@ function deleteSessionFile(sessionId: string): void {
   if (fs.existsSync(file)) fs.unlinkSync(file);
 }
 
-async function reattachDriver(wdSessionId: string, port: number): Promise<Browser> {
+async function reattachDriver(wdSessionId: string, port: number, platform: Platform): Promise<Browser> {
+  // Without a mobile platformName, webdriverio treats the session as a browser and calls window endpoints that Appium 3 removed.
   return attach({
     sessionId: wdSessionId,
+    capabilities: { platformName: platform === "ios" ? "iOS" : "Android" },
     hostname: "127.0.0.1",
     port,
     path: "/",
@@ -112,10 +114,10 @@ async function getSession(sessionId: string): Promise<Session> {
   await ensureAppium(saved.port);
 
   // Reattach to WebDriver sessions
-  const primaryDriver = await reattachDriver(saved.primarySessionId, saved.port);
+  const primaryDriver = await reattachDriver(saved.primarySessionId, saved.port, saved.primaryPlatform);
   let secondaryDriver: Browser | undefined;
   if (saved.secondarySessionId) {
-    secondaryDriver = await reattachDriver(saved.secondarySessionId, saved.port);
+    secondaryDriver = await reattachDriver(saved.secondarySessionId, saved.port, saved.secondaryPlatform!);
   }
 
   session = {
@@ -191,7 +193,9 @@ async function ensureAppium(port: number): Promise<void> {
     }
   }
 
+  // Appium discovers the npm-installed drivers only when it starts in the directory that declares them.
   const child = spawn(appiumBin, ["--port", String(port), "--relaxed-security"], {
+    cwd: libDir,
     stdio: "ignore",
     detached: true,
   });
@@ -539,8 +543,7 @@ async function performAction(driver: Browser, platform: Platform, action: Action
         } else {
           const [pkg, activity] = action.app.split("/");
           await driver.execute("mobile: startActivity", {
-            appPackage: pkg,
-            appActivity: activity || ".MainActivity",
+            intent: `${pkg}/${activity || ".MainActivity"}`,
           });
         }
         break;

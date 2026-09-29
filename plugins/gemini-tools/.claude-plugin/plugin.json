@@ -1,7 +1,7 @@
 {
   "name": "gemini-tools",
-  "version": "1.3.4",
-  "description": "Gemini models for visual analysis, UI/UX work, and image generation",
+  "version": "2.0.0",
+  "description": "Gemini image generation for UI mockups",
   "author": {
     "name": "paddo"
   }

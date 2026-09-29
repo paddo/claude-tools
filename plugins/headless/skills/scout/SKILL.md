@@ -19,7 +19,7 @@ bun "$SCOUT" "https://example.com/article" --json
 ```
 
 The fetcher tries direct retrieval, then scrape.do proxy retrieval, then rendering.
-Paid tiers require `SCRAPE_DO_API_KEY` in the host environment.
+Paid tiers read `SCRAPE_DO_API_KEY` from the environment first, then from the macOS keychain.
 Without that key, the fetcher can still retrieve pages directly.
 
 Options:

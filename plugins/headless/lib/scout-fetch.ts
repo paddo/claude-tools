@@ -15,12 +15,27 @@
 // fetcher detects that case and says so instead of burning credits on it.
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 
 const UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' +
   '(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
 const SD_ENDPOINT = 'https://api.scrape.do/';
+
+// The environment overrides the keychain; without either, the paid tiers are skipped.
+function scrapeDoToken(): string | undefined {
+  if (process.env.SCRAPE_DO_API_KEY) return process.env.SCRAPE_DO_API_KEY;
+  try {
+    return execFileSync('security', ['find-generic-password', '-s', 'paddo-tools', '-a', 'SCRAPE_DO_API_KEY', '-w'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return undefined;
+  }
+}
+
 const CENTS_PER_CREDIT = Number(process.env.SCRAPE_DO_CENTS_PER_CREDIT ?? 0.008);
 const DEFAULT_CREDITS = 10;
 
@@ -145,9 +160,9 @@ async function tierDirect(url: string, timeoutMs: number): Promise<Fetched> {
 }
 
 async function tierScrapeDo(url: string, opts: { sup?: boolean; render?: boolean; country?: string; timeoutMs: number }): Promise<Fetched> {
-  const token = process.env.SCRAPE_DO_API_KEY;
+  const token = scrapeDoToken();
   const tier = `scrape.do${opts.render ? '(render)' : '(super)'}`;
-  if (!token) return { ok: false, tier, reason: 'SCRAPE_DO_API_KEY not set' };
+  if (!token) return { ok: false, tier, reason: 'SCRAPE_DO_API_KEY not set in the environment or keychain' };
 
   const ledger = readLedger();
   if (ledger.credits >= MAX_CREDITS)

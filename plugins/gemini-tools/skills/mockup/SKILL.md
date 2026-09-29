@@ -5,7 +5,9 @@ description: Generate UI mockups with Gemini image generation using a text promp
 
 Generate the requested mockup with the bundled image script.
 Resolve `../../lib/nano-banana.ts` relative to this `SKILL.md` file. Use its absolute path as `MOCKUP_SCRIPT`.
-The host process must provide `GEMINI_API_KEY`. The script requires Bun and macOS to open the image.
+The script reads `GEMINI_API_KEY` from the environment first, then from the macOS keychain.
+A host sandbox can block network and keychain access. Run the script outside the sandbox.
+The script requires Bun and macOS to open the image.
 
 Inspect any supplied reference with the host image viewer.
 Capture the clipboard with `pngpaste` only when the user requests clipboard input.

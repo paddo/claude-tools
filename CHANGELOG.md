@@ -1,5 +1,35 @@
 # Release Notes
 
+## 2026-09-28
+
+Gemini Tools `2.0.0` removes the `visual` skill and the `gemini` agent, because the Gemini CLI is no longer available.
+The `mockup` skill and the `nano-banana` agent remain. They call the Gemini API directly.
+Mockups now use the stable `gemini-3.1-flash-image` model. Google's shutdown date for the preview model was 2026-06-25.
+
+Mobile `3.0.0` moves to Appium 3 and current drivers: XCUITest 12, UiAutomator2 8, and Flutter 4.
+Appium 3 requires Node.js 20.19 or later and npm 10 or later.
+Appium now starts in the plugin's `lib` directory. It found the npm-installed drivers only from there, so sessions started elsewhere had no drivers.
+Reattached sessions declare their platform. Otherwise webdriverio calls window endpoints that Appium 3 removed.
+The Android `launch` action passes the `intent` argument that UiAutomator2 requires.
+Android emulator (Android 16) and iOS simulator (iOS 26.5, Xcode 27) runs verified each action.
+The mobile evaluation now uses deterministic graders. Its judge saw only the final message and could not confirm the `shell-cmd` run, so it failed correct answers.
+
+API credentials can now come from the macOS keychain, under the `paddo-tools` service.
+An environment variable with the same name still overrides the keychain.
+Secrets no longer need to sit in shell profiles, and desktop apps no longer need to inherit them.
+Claude Code `userConfig` cannot pass sensitive values to skill shell commands, and Codex has no equivalent.
+The keychain therefore gives one method for both hosts.
+The Codex sandbox blocks keychain reads, so these commands run outside it. They already needed network access.
+
+| Plugin | Previous | Released |
+|---|---|---|
+| `dns` | `1.1.3` | `1.1.4` |
+| `gemini-tools` | `1.3.4` | `2.0.0` |
+| `headless` | `0.5.3` | `0.5.4` |
+| `miro` | `1.1.3` | `1.1.4` |
+| `mobile` | `2.1.4` | `3.0.0` |
+| `monday` | `1.4.3` | `1.4.4` |
+
 ## 2026-09-23
 
 Grok `1.0.7` stops headless reviews from ending early.

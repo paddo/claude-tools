@@ -9,10 +9,11 @@ Read and interpret Miro boards - extracts structure, content, and relationships.
    - Create a new app or use existing
    - Copy the access token
 
-2. Export the token before starting Claude Code or Codex:
+2. Store the token in the macOS keychain. The command prompts for the value:
    ```bash
-   export MIRO_TOKEN="your_token_here"
+   security add-generic-password -U -s paddo-tools -a MIRO_TOKEN -w
    ```
+   On other systems, export `MIRO_TOKEN` before you start Claude Code or Codex.
 
 ## Usage
 

@@ -1,10 +1,23 @@
 #!/usr/bin/env npx tsx
 import * as fs from "fs";
-import { spawn } from "child_process";
+import { execFileSync, spawn } from "child_process";
 
-const API_KEY = process.env.GEMINI_API_KEY;
+// The environment overrides the keychain.
+function geminiKey(): string {
+  if (process.env.GEMINI_API_KEY) return process.env.GEMINI_API_KEY;
+  try {
+    return execFileSync("security", ["find-generic-password", "-s", "paddo-tools", "-a", "GEMINI_API_KEY", "-w"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+  } catch {
+    return "";
+  }
+}
+
+const API_KEY = geminiKey();
 if (!API_KEY) {
-  console.error("GEMINI_API_KEY not set");
+  console.error("GEMINI_API_KEY not set in the environment or keychain");
   process.exit(1);
 }
 
@@ -43,7 +56,7 @@ const body = {
 };
 
 const url =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent";
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent";
 
 async function run() {
   const res = await fetch(url, {

@@ -72,9 +72,9 @@ Fallback to XPath:
 
 ## Requirements
 
-- **iOS**: Xcode CLI tools, Simulator or physical device
+- **iOS**: Xcode with its license accepted, and a Simulator or physical device
 - **Android**: ADB, Emulator or physical device
-- **Node.js**: For Appium server
+- **Node.js**: 20.19 or later with npm 10 or later, for Appium 3
 
 ## Session Files
 
