@@ -29,7 +29,7 @@ Both marketplaces use the name `paddo-tools`.
 | `codex` | `review` | Codex architecture analysis, research, and review |
 | `kimi` | `review` | Independent Kimi CLI review |
 | `grok` | `review` | Independent Grok CLI review |
-| `gemini-tools` | `visual`, `mockup` | Gemini visual analysis and mockup generation |
+| `gemini-tools` | `mockup` | Gemini mockup generation |
 | `dns` | `spaceship`, `godaddy` | DNS record management |
 | `headless` | `test`, `parity`, `scout` | Browser tests, site comparison, and web research |
 | `mobile` | `test`, `parity`, `dev`, `test-runner` | Appium testing and Maestro workflows |
@@ -45,8 +45,6 @@ Natural-language requests also work, such as “Use Grok to review these changes
 ## Requirements
 
 Use a local host with shell access and the tools required by the selected plugin.
-A desktop app must inherit the required environment variables.
-Claude settings do not configure Codex credentials.
 
 | Plugin | Required tools or access |
 |---|---|
@@ -54,17 +52,28 @@ Claude settings do not configure Codex credentials.
 | `codex` | Codex CLI on PATH and configured authentication |
 | `kimi` | Authenticated CLI at `~/.kimi-code/bin/kimi`, with noninteractive `-p` support |
 | `grok` | Authenticated Grok CLI on PATH, with plan mode support |
-| `gemini-tools` | Gemini CLI, Bun, `jq`; macOS and `pngpaste` for clipboard workflows |
+| `gemini-tools` | Bun and macOS; `pngpaste` for clipboard input |
 | `dns`, `miro`, `monday` | `curl`, `jq`, and the relevant API credentials |
 | `headless` | Bun, `agent-browser`, and its browser installation |
-| `mobile` | Node.js, npm, Appium dependencies, and available devices; Maestro for its workflows |
+| `mobile` | Node.js 20.19 or later, npm 10 or later, and available devices; Maestro for its workflows |
 | `whatsapp` | macOS, `sqlite3`, and locally synced WhatsApp data |
 
-Export the required credentials before starting either host:
+### Credentials
 
-| Workflow | Environment variables |
+The plugins read each API credential from the environment first, then from the macOS keychain.
+Keychain storage keeps secrets out of shell profiles, and desktop apps do not need to inherit them.
+Store each credential under the `paddo-tools` service. The command prompts for the value:
+
+```bash
+security add-generic-password -U -s paddo-tools -a MONDAY_API_TOKEN -w
+```
+
+On other systems, export the variables before you start either host.
+The Codex sandbox blocks keychain reads and network access. Approve these commands to run outside it.
+
+| Workflow | Credential names |
 |---|---|
-| Gemini | `GEMINI_API_KEY` |
+| Gemini mockups | `GEMINI_API_KEY` |
 | Spaceship | `SPACESHIP_API_KEY`, `SPACESHIP_API_SECRET` |
 | GoDaddy | `GODADDY_API_KEY`, `GODADDY_API_SECRET` |
 | Miro | `MIRO_TOKEN` |
@@ -72,7 +81,7 @@ Export the required credentials before starting either host:
 | Scout paid retrieval | `SCRAPE_DO_API_KEY` |
 
 Scout uses direct retrieval without a paid key. `SCOUT_MAX_CREDITS` sets its shared budget limit.
-External review CLIs use their configured accounts and models.
+External review CLIs use their own configured accounts and models.
 
 ## Structure
 

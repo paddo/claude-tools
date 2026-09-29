@@ -8,7 +8,7 @@ Read and interpret Miro boards via API, presenting structured analysis for plann
 
 **Auth Header:**
 ```
-Authorization: Bearer $(printenv MIRO_TOKEN)
+Authorization: Bearer $(sh "$CREDENTIAL" MIRO_TOKEN)
 ```
 
 ## Extracting Board ID
@@ -20,27 +20,27 @@ From URL `https://miro.com/app/board/uXjV...=/` → board ID is `uXjV...=`
 ### Get Board Info
 ```bash
 curl -s "https://api.miro.com/v2/boards/{board_id}" \
-  -H "Authorization: Bearer $(printenv MIRO_TOKEN)" | jq '{name, description, createdAt, modifiedAt}'
+  -H "Authorization: Bearer $(sh "$CREDENTIAL" MIRO_TOKEN)" | jq '{name, description, createdAt, modifiedAt}'
 ```
 
 ### Get All Items (paginated)
 ```bash
 curl -s "https://api.miro.com/v2/boards/{board_id}/items?limit=50" \
-  -H "Authorization: Bearer $(printenv MIRO_TOKEN)" | jq
+  -H "Authorization: Bearer $(sh "$CREDENTIAL" MIRO_TOKEN)" | jq
 ```
 
 ### Get Items by Type
 ```bash
 # Types: sticky_note, shape, text, frame, connector, image, card, app_card
 curl -s "https://api.miro.com/v2/boards/{board_id}/sticky_notes?limit=50" \
-  -H "Authorization: Bearer $(printenv MIRO_TOKEN)" | jq
+  -H "Authorization: Bearer $(sh "$CREDENTIAL" MIRO_TOKEN)" | jq
 ```
 
 ### Pagination
 Response includes `cursor` for next page:
 ```bash
 curl -s "https://api.miro.com/v2/boards/{board_id}/items?limit=50&cursor={cursor}" \
-  -H "Authorization: Bearer $(printenv MIRO_TOKEN)" | jq
+  -H "Authorization: Bearer $(sh "$CREDENTIAL" MIRO_TOKEN)" | jq
 ```
 
 ## Item Types & Properties
@@ -174,6 +174,6 @@ Horizontal frames representing stages, stickies for touchpoints
 
 ## Error Handling
 
-- 401: Invalid token - check $(printenv MIRO_TOKEN)
+- 401: Invalid token - check the MIRO_TOKEN credential
 - 404: Board not found or no access
 - 429: Rate limited - wait and retry

@@ -18,7 +18,7 @@
     {
       "name": "gemini-tools",
       "source": "./plugins/gemini-tools",
-      "description": "Launch Gemini for visual analysis, UI/UX work, and image generation"
+      "description": "Generate UI mockups with the Gemini image model"
     },
     {
       "name": "headless",

@@ -9,10 +9,11 @@ Manage Monday.com tasks: list boards, query items, update status, assign yoursel
    - My Access Tokens → Show (or Generate)
    - Copy the token
 
-2. Export the token before starting Claude Code or Codex:
+2. Store the token in the macOS keychain. The command prompts for the value:
    ```bash
-   export MONDAY_API_TOKEN="your_token_here"
+   security add-generic-password -U -s paddo-tools -a MONDAY_API_TOKEN -w
    ```
+   On other systems, export `MONDAY_API_TOKEN` before you start Claude Code or Codex.
 
 ## Usage
 
