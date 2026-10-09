@@ -20,13 +20,14 @@ Write the complete prompt with a quoted heredoc. Choose a delimiter absent from 
 ```bash
 REVIEW_PROMPT=$(mktemp /tmp/grok-review-prompt.XXXXXX)
 REVIEW_OUTPUT=$(mktemp /tmp/grok-review-output.XXXXXX)
+REVIEW_LOG=$(mktemp /tmp/grok-review-log.XXXXXX)
 cat << 'GROK_REVIEW_INPUT' > "$REVIEW_PROMPT"
 <review request, diff, and surrounding code>
 GROK_REVIEW_INPUT
 GROK_CLAUDE_SKILLS_ENABLED=false GROK_CLAUDE_HOOKS_ENABLED=false GROK_CLAUDE_MCPS_ENABLED=false \
 GROK_CLAUDE_RULES_ENABLED=false GROK_CLAUDE_AGENTS_ENABLED=false \
 grok --prompt-file "$REVIEW_PROMPT" --permission-mode dontAsk --no-subagents \
-  --tools read_file,grep,list_dir > "$REVIEW_OUTPUT"
+  --tools read_file,grep,list_dir --debug-file "$REVIEW_LOG" > "$REVIEW_OUTPUT"
 ```
 
 Run from the target repository. Grok reads surrounding files with read-only tools. It has no shell, so put the diff in the prompt.
@@ -35,9 +36,14 @@ Keep every flag and variable above. Do not enable automatic tool approval.
 - By default Grok loads Claude skills, hooks, MCP servers, and instructions. A Claude review skill can make Grok follow that skill instead of the prompt. The variables turn this off.
 - `--prompt-file` avoids the 128 KB limit on one command-line argument.
 - Treat an answer that stops before any findings or a clear "no findings" statement as a failed run. Report it as a CLI failure.
+- Grok writes one opening sentence, then nothing until its final answer. It reads many files first, so a review often takes 5 to 15 minutes.
+  A silent `REVIEW_OUTPUT` does not mean Grok has hung. `REVIEW_LOG` grows with every tool call and model request.
+  Treat the run as hung only when `REVIEW_LOG` has not grown for 5 minutes. Then stop it and report a CLI failure.
+- Do not pass `--max-turns`. When Grok reaches the limit, it cancels the turn and returns no answer.
 Start the CLI with the host's background-process or yielding shell support.
 In Claude Code, set Bash `run_in_background: true` and wait with `TaskOutput`.
 Keep the process handle when the host shell returns before completion. Wait, then read `REVIEW_OUTPUT`.
 Do not start another review while that process runs.
 If the CLI fails, report its error. Do not substitute your own review.
+Delete `REVIEW_LOG` after the run. It holds the session's tool calls.
 If the caller supplies a report path, write the verified report there before returning it.
