@@ -1,5 +1,12 @@
 # Release Notes
 
+## 2026-10-09
+
+Grok `1.0.8` stops callers from mistaking a working review for a hung one.
+Grok prints one opening sentence, then nothing until its final answer. A review often takes 5 to 15 minutes of tool calls.
+Reviews now write a debug log with `--debug-file`. Callers treat a run as hung only when that log stops growing for 5 minutes.
+The skill also warns against `--max-turns`. At the limit, Grok cancels the turn and returns no answer.
+
 ## 2026-09-23
 
 Grok `1.0.7` stops headless reviews from ending early.
