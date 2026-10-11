@@ -1,5 +1,22 @@
 # Release Notes
 
+## 2026-10-11
+
+Headless `0.6.0` no longer runs `agent-browser install` before every first test.
+agent-browser detects an installed Chrome. The download gave a second browser without the user's logins.
+The browser reference now explains a `profile` in the user's agent-browser config.
+A Chrome profile name gives each session a copy of the user's logins, so the agent acts as the user.
+That setup also needs `executablePath`, because agent-browser prefers an installed Chrome for Testing.
+Chrome for Testing cannot decrypt Chrome's cookies.
+The reference says how to get a logged-out session instead.
+It also says how to wait for a user step, such as a passkey: run headed, then repeat `wait` until the page moves on.
+A changed launch flag mid-session relaunches the browser and loses the page, so the reference says to keep flags fixed.
+Scout now suggests agent-browser with a logged-in profile for authentication walls.
+
+| Plugin | Previous | Released |
+|---|---|---|
+| `headless` | `0.5.4` | `0.6.0` |
+
 ## 2026-09-28
 
 Gemini Tools `2.0.0` removes the `visual` skill and the `gemini` agent, because the Gemini CLI is no longer available.

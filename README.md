@@ -54,7 +54,7 @@ Use a local host with shell access and the tools required by the selected plugin
 | `grok` | Authenticated Grok CLI on PATH, with plan mode support |
 | `gemini-tools` | Bun and macOS; `pngpaste` for clipboard input |
 | `dns`, `miro`, `monday` | `curl`, `jq`, and the relevant API credentials |
-| `headless` | Bun, `agent-browser`, and its browser installation |
+| `headless` | Bun, `agent-browser`, and Chrome, Brave, or a Playwright or Puppeteer browser |
 | `mobile` | Node.js 20.19 or later, npm 10 or later, and available devices; Maestro for its workflows |
 | `whatsapp` | macOS, `sqlite3`, and locally synced WhatsApp data |
 

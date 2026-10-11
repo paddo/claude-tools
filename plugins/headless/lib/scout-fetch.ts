@@ -277,9 +277,9 @@ function finish(f: Fetched, attempts: any[], a: any, failure?: string) {
   if (failure) {
     lines.push(`\nFAILED: ${failure}`);
     if (failure === 'auth_wall')
-      lines.push('This is a hard authentication wall. An unlocker will not help - needs login cookies or an official API.');
+      lines.push('This is a hard authentication wall. An unlocker will not help - needs login cookies or an official API. Try agent-browser with a logged-in Chrome profile.');
     if (failure === 'anti_bot')
-      lines.push('Anti-bot challenge survived super proxy + render. Try --country, or fall back to agent-browser with a cloud provider.');
+      lines.push('Anti-bot challenge survived super proxy + render. Try --country, or fall back to agent-browser.');
     if (failure === 'budget')
       lines.push('Per-run credit budget exhausted (SCOUT_MAX_CREDITS). Report what you have rather than raising the cap silently.');
   } else {

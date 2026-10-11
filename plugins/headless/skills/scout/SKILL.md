@@ -31,7 +31,8 @@ Options:
 
 Read the `ladder`, winning `tier`, and cost fields. Handle failures as follows:
 
-- `auth_wall`: Stop automatic escalation. Use an authorized session or another source. Rendering cannot supply missing credentials.
+- `auth_wall`: Stop automatic escalation. Rendering cannot supply missing credentials.
+  Try `agent-browser`, which carries the user's logins when their config sets a Chrome profile. Otherwise use another source.
 - `anti_bot`: Try a relevant country or an interactive browser. Report any remaining block.
 - `http_error` or `network`: Report the failure and continue with another source.
 
