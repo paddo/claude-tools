@@ -41,6 +41,18 @@
       "category": "Productivity"
     },
     {
+      "name": "gemini",
+      "source": {
+        "source": "local",
+        "path": "./plugins/gemini"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "gemini-tools",
       "source": {
         "source": "local",

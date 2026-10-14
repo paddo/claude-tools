@@ -56,6 +56,11 @@
       "description": "Launch Grok for second-opinion code review"
     },
     {
+      "name": "gemini",
+      "source": "./plugins/gemini",
+      "description": "Launch Gemini for second-opinion code review"
+    },
+    {
       "name": "claude",
       "source": "./plugins/claude",
       "description": "Run Claude CLI for independent code review"

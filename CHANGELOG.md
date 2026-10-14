@@ -1,5 +1,17 @@
 # Release Notes
 
+## 2026-10-14
+
+New `gemini` plugin `1.0.0` adds `/gemini:review`. It runs Gemini 4 Argon through the Antigravity CLI (`agy`) for an independent review, and the host verifies each finding.
+The Gemini CLI does not serve Argon, so the skill uses `agy` in headless plan mode.
+Headless `agy` returns `SUCCESS` with an empty response for prompts over about 64 KB, so the diff goes in a patch file that Gemini reads through `--add-dir`.
+It auto-denies writes and shell commands that need a permission prompt and then ends the turn with an empty response, so the skill treats an empty response or any `denied_actions` as a failed run.
+Plan mode does not enforce read-only access: allow rules in the user's `agy` settings still apply.
+
+| Plugin | Previous | Released |
+|---|---|---|
+| `gemini` | - | `1.0.0` |
+
 ## 2026-10-11
 
 Headless `0.6.0` no longer runs `agent-browser install` before every first test.

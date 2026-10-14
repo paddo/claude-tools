@@ -29,6 +29,7 @@ Both marketplaces use the name `paddo-tools`.
 | `codex` | `review` | Codex architecture analysis, research, and review |
 | `kimi` | `review` | Independent Kimi CLI review |
 | `grok` | `review` | Independent Grok CLI review |
+| `gemini` | `review` | Independent Gemini review through the Antigravity CLI |
 | `gemini-tools` | `mockup` | Gemini mockup generation |
 | `dns` | `spaceship`, `godaddy` | DNS record management |
 | `headless` | `test`, `parity`, `scout` | Browser tests, site comparison, and web research |
@@ -52,6 +53,7 @@ Use a local host with shell access and the tools required by the selected plugin
 | `codex` | Codex CLI on PATH and configured authentication |
 | `kimi` | Authenticated CLI at `~/.kimi-code/bin/kimi`, with noninteractive `-p` support |
 | `grok` | Authenticated Grok CLI on PATH, with plan mode support |
+| `gemini` | Antigravity CLI (`agy`) on PATH, signed in to a Google AI Ultra account |
 | `gemini-tools` | Bun and macOS; `pngpaste` for clipboard input |
 | `dns`, `miro`, `monday` | `curl`, `jq`, and the relevant API credentials |
 | `headless` | Bun, `agent-browser`, and Chrome, Brave, or a Playwright or Puppeteer browser |

@@ -1,0 +1,8 @@
+{
+  "name": "gemini",
+  "version": "1.0.0",
+  "description": "Launch Gemini for second-opinion code review",
+  "author": {
+    "name": "paddo"
+  }
+}
