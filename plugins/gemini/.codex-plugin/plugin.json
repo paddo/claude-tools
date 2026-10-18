@@ -1,15 +1,15 @@
 {
   "name": "gemini",
-  "version": "1.0.0",
-  "description": "Launch Gemini for second-opinion code review",
+  "version": "1.1.0",
+  "description": "Gemini second-opinion code review and Nano Banana UI mockups",
   "author": {
     "name": "paddo"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "Gemini",
-    "shortDescription": "Launch Gemini for second-opinion code review",
-    "longDescription": "Launch Gemini for second-opinion code review",
+    "shortDescription": "Gemini second-opinion code review and Nano Banana UI mockups",
+    "longDescription": "Gemini second-opinion code review and Nano Banana UI mockups",
     "developerName": "paddo",
     "category": "Productivity",
     "capabilities": [],

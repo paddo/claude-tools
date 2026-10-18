@@ -1,5 +1,19 @@
 # Release Notes
 
+## 2026-10-18
+
+Gemini `1.1.0` adds `/gemini:mockup` and the `nano-banana` agent. They move from `gemini-tools`, which this release removes.
+Mockups default to Nano Banana 2.1 (`gemini-nano-banana-2.1`). Google names it the replacement for `gemini-3.1-flash-image`.
+It renders text and layouts better than Nano Banana 2, at about half the price per image.
+`--model gemini-3-pro-image` selects Nano Banana Pro. `--thinking` sets the model's thinking level.
+`--ref` sends up to 14 reference images to the model. The skill previously described references in words.
+`--backend fal` runs the same models through fal with `FAL_KEY`. fal serves reference-image requests from its edit endpoints.
+
+| Plugin | Previous | Released |
+|---|---|---|
+| `gemini` | `1.0.0` | `1.1.0` |
+| `gemini-tools` | `2.0.0` | Removed |
+
 ## 2026-10-14
 
 New `gemini` plugin `1.0.0` adds `/gemini:review`. It runs Gemini 4 Argon through the Antigravity CLI (`agy`) for an independent review, and the host verifies each finding.
