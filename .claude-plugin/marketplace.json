@@ -16,11 +16,6 @@
       "description": "Launch OpenAI Codex for software architecture analysis and research"
     },
     {
-      "name": "gemini-tools",
-      "source": "./plugins/gemini-tools",
-      "description": "Generate UI mockups with the Gemini image model"
-    },
-    {
       "name": "headless",
       "source": "./plugins/headless",
       "description": "Headless browser automation for site comparison, E2E testing, and anti-bot-aware web research"
@@ -58,7 +53,7 @@
     {
       "name": "gemini",
       "source": "./plugins/gemini",
-      "description": "Launch Gemini for second-opinion code review"
+      "description": "Gemini second-opinion code review and Nano Banana UI mockups"
     },
     {
       "name": "claude",

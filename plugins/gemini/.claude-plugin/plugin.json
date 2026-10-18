@@ -1,7 +1,7 @@
 {
   "name": "gemini",
-  "version": "1.0.0",
-  "description": "Launch Gemini for second-opinion code review",
+  "version": "1.1.0",
+  "description": "Gemini second-opinion code review and Nano Banana UI mockups",
   "author": {
     "name": "paddo"
   }
