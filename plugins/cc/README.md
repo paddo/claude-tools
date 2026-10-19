@@ -1,12 +1,12 @@
-# claude
+# cc
 
 Run an independent Claude CLI review from Claude Code or Codex.
 The calling host verifies findings against the code before reporting them.
 
 ## Use
 
-- Claude Code: `/claude:review [scope]` or delegate to the `claude:review` agent.
-- Codex: select the `review` skill from the `claude` plugin, or request a Claude review.
+- Claude Code: `/cc:review [scope]` or delegate to the `cc:review` agent.
+- Codex: select the `review` skill from the `cc` plugin, or request a Claude review.
 
 The scope can specify a branch, PR, or files.
 The default includes changes against the default branch and local changes.
@@ -17,10 +17,10 @@ From this repository:
 
 ```bash
 claude plugin marketplace add .
-claude plugin install claude@paddo-tools
+claude plugin install cc@paddo-tools
 
 codex plugin marketplace add .
-codex plugin add claude@paddo-tools
+codex plugin add cc@paddo-tools
 ```
 
 ## Requirements
