@@ -38,7 +38,7 @@ Both marketplaces use the name `paddo-tools`.
 | `whatsapp` | `whatsapp` | Search the native macOS message database |
 
 Claude Code exposes skills as `/plugin:skill`, such as `/dns:spaceship` or `/cc:review`.
-Claude agents remain available under their existing names.
+Claude agents use the same form, such as the `cc:review` agent.
 In Codex, use `/skills` or `$` to select a skill from its plugin.
 Natural-language requests also work, such as “Use Grok to review these changes.”
 

@@ -2,9 +2,10 @@
 
 ## 2026-10-19
 
-The `claude` plugin is now `cc` `2.0.0`, so the review runs as `/cc:review`.
+The `claude` plugin is now `cc` `2.0.0`.
 Claude Code 2.1.302 and later reserve the plugin name `claude`, and `claude plugin validate` rejected the marketplace.
-Existing installs keep the old name until you install `cc@paddo-tools` and remove `claude@paddo-tools`.
+In Claude Code, the review skill is now `/cc:review` and the agent is `cc:review`. Codex lists the skill under the `cc` plugin.
+To migrate, install `cc@paddo-tools` and uninstall `claude@paddo-tools` on each host.
 
 | Plugin | Previous | Released |
 |---|---|---|
