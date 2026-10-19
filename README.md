@@ -6,16 +6,16 @@ See [release notes and plugin versions](CHANGELOG.md).
 
 ## Install
 
-Run these commands from this checkout. Replace `claude` with the required plugin name.
+Run these commands from this checkout. Replace `cc` with the required plugin name.
 
 ```bash
 # Claude Code
 claude plugin marketplace add .
-claude plugin install claude@paddo-tools
+claude plugin install cc@paddo-tools
 
 # Codex
 codex plugin marketplace add .
-codex plugin add claude@paddo-tools
+codex plugin add cc@paddo-tools
 ```
 
 For GitHub installation, use `paddo/claude-tools` instead of `.` as the marketplace source.
@@ -25,7 +25,7 @@ Both marketplaces use the name `paddo-tools`.
 
 | Plugin | Skills | Purpose |
 |---|---|---|
-| `claude` | `review` | Independent Claude CLI review |
+| `cc` | `review` | Independent Claude CLI review |
 | `codex` | `review` | Codex architecture analysis, research, and review |
 | `kimi` | `review` | Independent Kimi CLI review |
 | `grok` | `review` | Independent Grok CLI review |
@@ -37,8 +37,8 @@ Both marketplaces use the name `paddo-tools`.
 | `monday` | `monday` | Manage tasks, comments, and attachments |
 | `whatsapp` | `whatsapp` | Search the native macOS message database |
 
-Claude Code exposes skills as `/plugin:skill`, such as `/dns:spaceship` or `/claude:review`.
-Claude agents remain available under their existing names.
+Claude Code exposes skills as `/plugin:skill`, such as `/dns:spaceship` or `/cc:review`.
+Claude agents use the same form, such as the `cc:review` agent.
 In Codex, use `/skills` or `$` to select a skill from its plugin.
 Natural-language requests also work, such as “Use Grok to review these changes.”
 
@@ -48,7 +48,7 @@ Use a local host with shell access and the tools required by the selected plugin
 
 | Plugin | Required tools or access |
 |---|---|
-| `claude` | Claude CLI on PATH, authenticated account, and `--safe-mode` support |
+| `cc` | Claude CLI on PATH, authenticated account, and `--safe-mode` support |
 | `codex` | Codex CLI on PATH and configured authentication |
 | `kimi` | Authenticated CLI at `~/.kimi-code/bin/kimi`, with noninteractive `-p` support |
 | `grok` | Authenticated Grok CLI on PATH, with plan mode support |

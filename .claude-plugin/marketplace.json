@@ -56,8 +56,8 @@
       "description": "Gemini second-opinion code review and Nano Banana UI mockups"
     },
     {
-      "name": "claude",
-      "source": "./plugins/claude",
+      "name": "cc",
+      "source": "./plugins/cc",
       "description": "Run Claude CLI for independent code review"
     }
   ]

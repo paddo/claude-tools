@@ -1,6 +1,6 @@
 {
-  "name": "claude",
-  "version": "1.0.0",
+  "name": "cc",
+  "version": "2.0.0",
   "description": "Run Claude CLI for independent code review",
   "author": {
     "name": "paddo"
