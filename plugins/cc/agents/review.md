@@ -1,6 +1,8 @@
 ---
 name: review
 description: Run Claude CLI for independent code review and verify its findings.
+model: sonnet
+effort: low
 tools: Read, Glob, Grep, Bash
 ---
 
