@@ -1,7 +1,8 @@
 ---
 name: codex
 description: Architecture analysis and research using OpenAI Codex
-model: opus
+model: sonnet
+effort: low
 tools: Read, Glob, Grep, Bash, SendMessage
 ---
 

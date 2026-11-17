@@ -1,5 +1,19 @@
 # Release Notes
 
+## 2026-11-17
+
+The review agents now run on Sonnet at low effort: `codex`, `grok`, `gemini`, `kimi` and `cc:review`.
+The external CLI does the review. The agent runs it and checks each finding against the code, which does not need Opus.
+Before, `codex`, `grok`, `gemini` and `kimi` ran on Opus, and `cc:review` ran on the caller's model.
+
+| Plugin | Previous | Released |
+|---|---|---|
+| `codex` | `1.0.10` | `1.0.11` |
+| `grok` | `1.0.7` | `1.0.8` |
+| `gemini` | `1.1.0` | `1.1.1` |
+| `kimi` | `1.0.6` | `1.0.7` |
+| `cc` | `2.0.0` | `2.0.1` |
+
 ## 2026-10-19
 
 The `claude` plugin is now `cc` `2.0.0`.

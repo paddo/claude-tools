@@ -1,7 +1,8 @@
 ---
 name: gemini
 description: Second-opinion code review using Gemini
-model: opus
+model: sonnet
+effort: low
 tools: Read, Glob, Grep, Bash, SendMessage
 ---
 

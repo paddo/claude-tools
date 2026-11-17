@@ -1,7 +1,8 @@
 ---
 name: kimi
 description: Second-opinion code review using Moonshot Kimi K3
-model: opus
+model: sonnet
+effort: low
 tools: Read, Glob, Grep, Bash, SendMessage
 ---
 

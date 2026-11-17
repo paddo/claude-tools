@@ -1,7 +1,8 @@
 ---
 name: grok
 description: Second-opinion code review using Grok
-model: opus
+model: sonnet
+effort: low
 tools: Read, Glob, Grep, Bash, SendMessage
 ---
 
