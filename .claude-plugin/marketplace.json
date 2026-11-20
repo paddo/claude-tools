@@ -59,6 +59,11 @@
       "name": "cc",
       "source": "./plugins/cc",
       "description": "Run Claude CLI for independent code review"
+    },
+    {
+      "name": "my-chrome",
+      "source": "./plugins/my-chrome",
+      "description": "Drive the user's own Chrome, with their logins, through playwright-cli and the Playwright Extension"
     }
   ]
 }

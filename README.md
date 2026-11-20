@@ -32,6 +32,7 @@ Both marketplaces use the name `paddo-tools`.
 | `gemini` | `review`, `mockup` | Independent Gemini review through the Antigravity CLI, and Nano Banana mockups |
 | `dns` | `spaceship`, `godaddy` | DNS record management |
 | `headless` | `test`, `parity`, `scout` | Browser tests, site comparison, and web research |
+| `my-chrome` | `my-chrome` | Act in the user's own Chrome, with their logins |
 | `mobile` | `test`, `parity`, `dev`, `test-runner` | Appium testing and Maestro workflows |
 | `miro` | `miro` | Read and interpret boards |
 | `monday` | `monday` | Manage tasks, comments, and attachments |
@@ -55,6 +56,7 @@ Use a local host with shell access and the tools required by the selected plugin
 | `gemini` | Reviews: Antigravity CLI (`agy`) on PATH, signed in to a Google AI Ultra account. Mockups: Bun and macOS; `pngpaste` for clipboard input |
 | `dns`, `miro`, `monday` | `curl`, `jq`, and the relevant API credentials |
 | `headless` | Bun, `agent-browser`, and Chrome, Brave, or a Playwright or Puppeteer browser |
+| `my-chrome` | `playwright-cli` on PATH, Chrome with the Playwright Extension, and `PLAYWRIGHT_MCP_EXTENSION_TOKEN` to skip the connect prompt |
 | `mobile` | Node.js 20.19 or later, npm 10 or later, and available devices; Maestro for its workflows |
 | `whatsapp` | macOS, `sqlite3`, and locally synced WhatsApp data |
 

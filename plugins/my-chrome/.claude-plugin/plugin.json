@@ -1,0 +1,8 @@
+{
+  "name": "my-chrome",
+  "version": "1.0.0",
+  "description": "Drive the user's own Chrome, with their logins, through playwright-cli and the Playwright Extension",
+  "author": {
+    "name": "paddo"
+  }
+}

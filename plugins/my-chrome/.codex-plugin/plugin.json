@@ -1,0 +1,18 @@
+{
+  "name": "my-chrome",
+  "version": "1.0.0",
+  "description": "Drive the user's own Chrome, with their logins, through playwright-cli and the Playwright Extension",
+  "author": {
+    "name": "paddo"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "My Chrome",
+    "shortDescription": "Drive the user's own Chrome, with their logins",
+    "longDescription": "Drive the user's own Chrome, with their logins, through playwright-cli and the Playwright Extension",
+    "developerName": "paddo",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Use my-chrome for this task."
+  }
+}
