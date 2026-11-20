@@ -19,4 +19,5 @@ This mode does not enforce read-only tool access.
 Install and authenticate [Kimi Code CLI](https://moonshotai.github.io/kimi-code/) at `~/.kimi-code/bin/kimi`.
 Review runs use the configured account's usage limits.
 See the [Kimi command reference](https://moonshotai.github.io/kimi-code/en/reference/kimi-command).
-See the [marketplace setup](../../README.md#install).
+Install in Claude Code: `/plugin install kimi --marketplace paddo/claude-tools`.
+For Codex or a local checkout, see the [marketplace setup](../../README.md#install).

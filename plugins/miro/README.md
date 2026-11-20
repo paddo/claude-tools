@@ -23,7 +23,8 @@ Read and interpret Miro boards - extracts structure, content, and relationships.
 ```
 
 In Codex, select `miro` from the `miro` plugin.
-See the [marketplace setup](../../README.md#install).
+Install in Claude Code: `/plugin install miro --marketplace paddo/claude-tools`.
+For Codex or a local checkout, see the [marketplace setup](../../README.md#install).
 
 ## What It Does
 

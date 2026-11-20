@@ -16,4 +16,5 @@ The CLI runs in plan mode and uses its configured model and account.
 
 Install and authenticate Grok CLI on PATH.
 The CLI must support plan mode. Review runs use the configured account's usage limits.
-See the [marketplace setup](../../README.md#install).
+Install in Claude Code: `/plugin install grok --marketplace paddo/claude-tools`.
+For Codex or a local checkout, see the [marketplace setup](../../README.md#install).

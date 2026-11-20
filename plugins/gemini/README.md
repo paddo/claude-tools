@@ -18,7 +18,8 @@ The CLI runs in plan mode with `gemini-4-argon-high`.
 Install the Antigravity CLI (`agy`) and sign in with a Google account on a Google AI Ultra plan.
 Google Workspace accounts can be ineligible for Antigravity plan benefits. A personal Google account works.
 Review runs use the account's Antigravity quota.
-See the [marketplace setup](../../README.md#install).
+Install in Claude Code: `/plugin install gemini --marketplace paddo/claude-tools`.
+For Codex or a local checkout, see the [marketplace setup](../../README.md#install).
 
 ## Mockup
 
