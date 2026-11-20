@@ -1,5 +1,15 @@
 # Release Notes
 
+## 2026-11-20
+
+New `my-chrome` plugin `1.0.0` drives the user's own Chrome through `playwright-cli` and the Playwright Extension, for sites that need the user's logins.
+`headless` stays the tool for logged-out browsing. `my-chrome` acts in the user's real profile, so it sends only on an explicit request and reads back each message before it sends.
+It includes Outlook web recipes: open a thread, download an attachment, and reply all.
+
+| Plugin | Previous | Released |
+|---|---|---|
+| `my-chrome` | New | `1.0.0` |
+
 ## 2026-11-17
 
 The review agents now run on Sonnet at low effort: `codex`, `grok`, `gemini`, `kimi` and `cc:review`.
