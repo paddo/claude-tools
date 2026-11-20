@@ -13,7 +13,8 @@ The host inspects screenshots and UI hierarchy to control the app.
 
 Claude Code exposes `/mobile:test`, `/mobile:parity`, `/mobile:dev`, and `/mobile:test-runner`.
 In Codex, select those skills from the `mobile` plugin.
-See the [marketplace setup](../../README.md#install).
+Install in Claude Code: `/plugin install mobile --marketplace paddo/claude-tools`.
+For Codex or a local checkout, see the [marketplace setup](../../README.md#install).
 
 ## Setup
 

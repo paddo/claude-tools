@@ -40,4 +40,5 @@ Use the CLI's configured account and model.
 
 In Codex, select `review` from the `codex` plugin.
 The skill starts an independent CLI process in read-only mode.
-See the [marketplace setup](../../README.md#install).
+Install in Claude Code: `/plugin install codex --marketplace paddo/claude-tools`.
+For Codex or a local checkout, see the [marketplace setup](../../README.md#install).

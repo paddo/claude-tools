@@ -25,7 +25,8 @@ Manage Monday.com tasks: list boards, query items, update status, assign yoursel
 ```
 
 In Codex, select `monday` from the `monday` plugin.
-See the [marketplace setup](../../README.md#install).
+Install in Claude Code: `/plugin install monday --marketplace paddo/claude-tools`.
+For Codex or a local checkout, see the [marketplace setup](../../README.md#install).
 
 ## Commands
 
